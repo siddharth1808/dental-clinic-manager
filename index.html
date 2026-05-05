@@ -1,0 +1,1945 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>🦷 DentCare Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script src="https://accounts.google.com/gsi/client" async></script>
+<style>
+:root{
+  --t:#0d9488;--tl:#ccfbf1;--tp:#f0fdfa;
+  --b:#2563eb;--bl:#dbeafe;
+  --r:#dc2626;--rl:#fee2e2;
+  --g:#16a34a;--gl:#dcfce7;
+  --a:#d97706;--al:#fef3c7;
+  --p:#7c3aed;--pl:#ede9fe;
+  --ink:#0f172a;--ink2:#475569;--ink3:#94a3b8;
+  --bg:#f1f5f9;--s:#fff;--bd:#e2e8f0;
+  --sh:0 1px 3px rgba(0,0,0,.08);
+  --shm:0 4px 16px rgba(0,0,0,.1);
+  --rr:12px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--ink);font-size:14px}
+
+/* ── AUTH ── */
+.asc{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:16px;overflow-y:auto;z-index:900}
+.asc.off{display:none}
+#sc-setup{background:linear-gradient(135deg,#0a0f1e,#0d3d38)}
+#sc-login{background:linear-gradient(135deg,#0a0f1e,#0d9488)}
+#sc-clinic{background:linear-gradient(135deg,#0f766e,#1e3a5f);align-items:flex-start;padding:20px 16px}
+#sc-pend{background:linear-gradient(135deg,#0a0f1e,#4a1d96)}
+#sc-rej{background:linear-gradient(135deg,#7f1d1d,#0a0f1e)}
+.acard{background:#fff;border-radius:18px;width:100%;max-width:460px;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,.18)}
+.ahero{padding:24px 24px 18px;color:#fff}
+.ahero h1{font-size:18px;font-weight:800}
+.ahero p{font-size:12px;opacity:.8;margin-top:4px;line-height:1.6}
+.abody{padding:20px 24px}
+.afoot{padding:10px 24px;background:var(--bg);font-size:11px;color:var(--ink3);display:flex;justify-content:space-between}
+.afoot a{color:var(--t);cursor:pointer;font-weight:600}
+.ss{display:flex;gap:10px;margin-bottom:13px}
+.sn{width:22px;height:22px;border-radius:50%;background:var(--t);color:#fff;font-weight:800;font-size:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.sc{}.sc h4{font-size:12px;font-weight:700;margin-bottom:2px}
+.sc p{font-size:11px;color:var(--ink2);line-height:1.6}
+.sc a{color:var(--t);font-weight:600;text-decoration:none}
+.pill{background:#0a0f1e;color:#7dd3fc;font-family:'JetBrains Mono',monospace;font-size:10px;padding:1px 6px;border-radius:4px}
+.ctabs{display:flex;gap:3px;background:var(--bg);padding:3px;border-radius:8px;margin-bottom:13px}
+.ctab{flex:1;padding:7px;text-align:center;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;color:var(--ink2);transition:.15s}
+.ctab.on{background:#fff;color:var(--ink);box-shadow:var(--sh)}
+.gbtn{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;padding:12px 16px;background:#fff;border:2px solid var(--bd);border-radius:10px;cursor:pointer;font-size:13px;font-weight:600;font-family:'Sora',sans-serif;color:var(--ink);transition:.2s}
+.gbtn:hover{border-color:var(--t)}
+.gbtn img{width:18px}
+.pa{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--p),var(--b));display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 14px;animation:pp 2s ease-in-out infinite}
+@keyframes pp{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+.sit{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f1f5f9}
+.sit:last-child{border-bottom:none}
+.sdot{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0}
+.sdot.ok{background:var(--gl);color:var(--g)}
+.sdot.ac{background:var(--pl);color:var(--p);animation:pp 1.5s infinite}
+.sdot.wt{background:#f1f5f9;color:var(--ink3)}
+
+/* ── APP ── */
+#app{display:none;flex-direction:column;min-height:100vh}
+#app.on{display:flex}
+#bar{background:var(--ink);color:#fff;height:54px;display:flex;align-items:center;padding:0 14px;gap:10px;flex-shrink:0;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+#bar h2{flex:1;font-size:14px;font-weight:700}
+.bb{background:rgba(255,255,255,.1);border:none;color:#fff;font-size:13px;cursor:pointer;padding:7px 11px;border-radius:8px;font-family:'Sora',sans-serif;font-weight:600;white-space:nowrap;line-height:1}
+.bb.pr{background:var(--t)}
+.bb.ic{background:none;font-size:19px;padding:6px}
+#main{flex:1;overflow-y:auto;padding:13px;padding-bottom:74px;-webkit-overflow-scrolling:touch}
+#bnav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--bd);display:flex;height:58px;z-index:100;box-shadow:0 -2px 10px rgba(0,0,0,.07)}
+.bn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;color:var(--ink3);font-size:10px;font-weight:600;padding:5px 2px;position:relative;border:none;background:none;font-family:'Sora',sans-serif;transition:.15s}
+.bn.on{color:var(--t)}
+.bn .bi{font-size:20px;line-height:1}
+.bn .bbd{position:absolute;top:5px;right:calc(50% - 14px);background:var(--r);color:#fff;font-size:9px;font-weight:700;padding:1px 4px;border-radius:99px;display:none}
+.bn.hb .bbd{display:block}
+
+/* ── PAGES ── */
+.page{display:none}
+.page.on{display:block;animation:pu .2s ease}
+@keyframes pu{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+
+/* ── CARDS ── */
+.card{background:var(--s);border:1px solid var(--bd);border-radius:var(--rr);box-shadow:var(--sh)}
+.ch{padding:12px 15px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;gap:8px}
+.ch h3{font-size:13px;font-weight:700}
+.cb{padding:13px 15px}
+
+/* ── KPI ── */
+.kgrid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:13px}
+.kpi{background:var(--s);border-radius:var(--rr);padding:13px;border:1px solid var(--bd);cursor:pointer;transition:.2s;position:relative;overflow:hidden}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.kpi.t::before{background:var(--t)}.kpi.b::before{background:var(--b)}.kpi.g::before{background:var(--g)}.kpi.r::before{background:var(--r)}.kpi.a::before{background:var(--a)}.kpi.p::before{background:var(--p)}
+.kpi:hover{transform:translateY(-1px);box-shadow:var(--shm)}
+.kico{font-size:18px;margin-bottom:5px}.kval{font-size:20px;font-weight:800;font-family:'JetBrains Mono',monospace;line-height:1}.klbl{font-size:10px;color:var(--ink2);margin-top:2px;font-weight:500}
+
+/* ── BADGE ── */
+.bge{display:inline-block;padding:2px 6px;border-radius:99px;font-size:10px;font-weight:600;white-space:nowrap}
+.bg{background:var(--gl);color:#15803d}.br2{background:var(--rl);color:var(--r)}.ba{background:var(--al);color:var(--a)}.bb2{background:var(--bl);color:var(--b)}.bgg{background:#f1f5f9;color:var(--ink2)}.bt{background:var(--tl);color:var(--t)}.bp{background:var(--pl);color:var(--p)}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:9px 15px;border:none;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;font-family:'Sora',sans-serif;transition:.15s;white-space:nowrap;line-height:1}
+.w{width:100%}.bt2{background:var(--t);color:#fff}.bt2:hover{filter:brightness(1.08)}.bb3{background:var(--b);color:#fff}.bd{background:var(--r);color:#fff}.bg2{background:transparent;color:var(--ink2);border:1px solid var(--bd)}.bg2:hover{background:var(--bg)}.bwa{background:#25d366;color:#fff}.bam{background:var(--a);color:#fff}.sm{padding:6px 11px;font-size:11px}.xs{padding:4px 8px;font-size:10px}
+
+/* ── FORM ── */
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.f{display:flex;flex-direction:column;gap:3px}.f.fl{grid-column:1/-1}
+label{font-size:11px;font-weight:600;color:var(--ink2);display:block}
+input,select,textarea{width:100%;padding:9px 10px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px;font-family:'Sora',sans-serif;color:var(--ink);background:#fff;outline:none;transition:.15s;-webkit-appearance:none}
+input:focus,select:focus,textarea:focus{border-color:var(--t);box-shadow:0 0 0 3px rgba(13,148,136,.1)}
+textarea{resize:vertical;min-height:65px}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23475569' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 9px center;padding-right:26px}
+.trow{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid #f1f5f9}
+.trow:last-child{border-bottom:none}
+.trow label{font-size:12px;font-weight:500;color:var(--ink);margin:0}
+.tog{position:relative;width:36px;height:21px;flex-shrink:0}
+.tog input{opacity:0;width:0;height:0}
+.tsl{position:absolute;inset:0;background:#cbd5e1;border-radius:99px;transition:.2s;cursor:pointer}
+.tsl::before{content:'';position:absolute;width:15px;height:15px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s}
+.tog input:checked+.tsl{background:var(--t)}
+.tog input:checked+.tsl::before{transform:translateX(15px)}
+.prog{background:#e2e8f0;border-radius:99px;height:6px;overflow:hidden}
+.pfil{height:100%;border-radius:99px;background:var(--t);transition:width .4s}
+
+/* ── MODAL ── */
+.mov{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:500;display:none;align-items:flex-end}
+.mov.on{display:flex}
+.mbox{overflow-y:auto}
+.mbox{background:#fff;border-radius:20px 20px 0 0;width:100%;max-height:94vh;overflow-y:auto;box-shadow:0 -4px 40px rgba(0,0,0,.2);animation:mup .25s ease}
+@keyframes mup{from{transform:translateY(100%)}to{transform:none}}
+@media(min-width:900px){@keyframes mup{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}}
+.mh{padding:13px 17px 11px;border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:#fff;z-index:1}
+.mh h3{font-size:13px;font-weight:700}
+.mx{background:var(--bg);border:none;font-size:16px;cursor:pointer;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif}
+.mbody{padding:14px 17px}
+.mfoot{padding:11px 17px;border-top:1px solid var(--bd);display:flex;gap:7px;position:sticky;bottom:0;background:#fff}
+.drag{width:36px;height:4px;background:#cbd5e1;border-radius:99px;margin:7px auto 0}
+
+/* ── PATIENT ITEM ── */
+.pti{background:var(--s);border:1px solid var(--bd);border-radius:var(--rr);padding:12px 13px;margin-bottom:7px;cursor:pointer;transition:.15s;display:flex;align-items:center;gap:11px}
+.pti:hover{border-color:var(--t);background:var(--tp)}
+.ptav{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--t),var(--b));color:#fff;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
+/* ── TREATMENT CARD (new) ── */
+.tcard{background:var(--s);border:1px solid var(--bd);border-radius:var(--rr);overflow:hidden;margin-bottom:11px}
+.thead2{padding:11px 13px;background:linear-gradient(135deg,var(--ink),#1e3a5f);color:#fff;display:flex;align-items:center;gap:9px}
+.tbody{padding:12px 13px}
+.siti{border:1px solid var(--bd);border-radius:8px;padding:9px 11px;margin-bottom:5px;background:#fff;display:flex;align-items:flex-start;gap:8px}
+.sinum{width:22px;height:22px;border-radius:50%;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+
+/* ── VISIT TYPE BUTTONS ── */
+.vtgrid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:12px 0}
+.vtbtn{padding:14px 10px;border-radius:10px;border:2px solid var(--bd);cursor:pointer;text-align:center;transition:.2s;background:#fff}
+.vtbtn:hover{border-color:var(--t)}
+.vtbtn.on{border-color:var(--t);background:var(--tp)}
+.vtbtn .ico{font-size:26px;margin-bottom:6px}
+.vtbtn h5{font-size:12px;font-weight:700}
+.vtbtn p{font-size:10px;color:var(--ink2);margin-top:2px}
+
+/* ── DATE FILTER ── */
+.dfw{display:flex;gap:5px;margin-bottom:11px;overflow-x:auto;padding-bottom:3px}
+.dfw::-webkit-scrollbar{display:none}
+.dfb{padding:6px 12px;border:1.5px solid var(--bd);border-radius:99px;font-size:11px;font-weight:600;cursor:pointer;background:#fff;color:var(--ink2);white-space:nowrap;font-family:'Sora',sans-serif;transition:.15s;flex-shrink:0}
+.dfb.on{background:var(--t);border-color:var(--t);color:#fff}
+
+/* ── SEARCH ── */
+.swrap{position:relative;margin-bottom:11px}
+.swrap input{padding-left:33px}
+.swrap::before{content:"🔍";position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:13px;pointer-events:none;z-index:1}
+
+/* ── WA ── */
+.waw{background:#e5ddd5;border-radius:10px;padding:11px;margin-top:9px}
+.wabb{background:#fff;border-radius:10px 10px 10px 2px;padding:10px 12px;font-size:12px;line-height:1.7;color:#111;max-width:92%;white-space:pre-wrap}
+.lrow{display:flex;gap:5px;margin-bottom:7px}
+.lbtn{padding:5px 11px;border-radius:6px;border:1.5px solid var(--bd);font-size:11px;font-weight:600;cursor:pointer;font-family:'Sora',sans-serif;background:#fff;transition:.15s}
+.lbtn.on{background:var(--t);color:#fff;border-color:var(--t)}
+
+/* ── MISC ── */
+.empty{text-align:center;padding:30px 16px;color:var(--ink3)}
+.empty .ei{font-size:34px;margin-bottom:8px}
+.empty p{font-size:12px}
+.div{height:1px;background:var(--bd);margin:13px 0}
+.stit{font-size:13px;font-weight:700;margin-bottom:9px}
+.mn{font-family:'JetBrains Mono',monospace;font-weight:600}
+.mn.g{color:var(--g)}.mn.r{color:var(--r)}.mn.a{color:var(--a)}
+.ibox{background:var(--tp);border:1px solid var(--tl);border-radius:8px;padding:9px 12px;font-size:12px;color:var(--ink2);line-height:1.6;margin-bottom:11px}
+.wbox{background:var(--al);border:1px solid #fde047;border-radius:8px;padding:9px 12px;font-size:12px;color:#713f12;line-height:1.6}
+#toast{position:fixed;bottom:66px;left:50%;transform:translateX(-50%) translateY(8px);background:var(--ink);color:#fff;padding:9px 16px;border-radius:10px;font-size:12px;font-weight:500;opacity:0;transition:.3s;z-index:9999;pointer-events:none;max-width:88%;text-align:center}
+#toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+.sp{display:inline-flex;align-items:center;gap:4px;font-size:9px;padding:2px 7px;border-radius:99px;background:rgba(255,255,255,.1);color:rgba(255,255,255,.6)}
+.sd{width:5px;height:5px;border-radius:50%}
+.sd.ok{background:#4ade80}.sd.sy{background:var(--a);animation:pulse 1s infinite}.sd.er{background:var(--r)}.sd.of{background:rgba(255,255,255,.3)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+@media(min-width:600px){
+  .kgrid{grid-template-columns:repeat(3,1fr)}
+}
+
+/* ── DESKTOP LAYOUT ── */
+@media(min-width:900px){
+  body{background:#e8edf2}
+  #app{flex-direction:row;min-height:100vh}
+  
+  /* Sidebar */
+  #bnav{
+    position:fixed;top:0;left:0;bottom:0;right:auto;
+    width:220px;height:100vh;
+    flex-direction:column;justify-content:flex-start;
+    border-top:none;border-right:1px solid var(--bd);
+    padding:70px 12px 20px;
+    box-shadow:2px 0 8px rgba(0,0,0,.05);
+    background:#fff;
+    z-index:50;
+  }
+  .bn{
+    flex:none;flex-direction:row;justify-content:flex-start;
+    padding:11px 14px;border-radius:10px;gap:10px;
+    font-size:13px;font-weight:600;margin-bottom:3px;
+    text-align:left;width:100%;
+  }
+  .bn .bi{font-size:18px}
+  .bn.on{background:var(--tp);color:var(--t)}
+  .bn:hover:not(.on){background:#f8fafc}
+  .bn .bbd{top:8px;right:10px}
+
+  /* Top bar full width */
+  #bar{
+    position:fixed;top:0;left:220px;right:0;
+    z-index:100;border-radius:0;
+    height:54px;
+  }
+
+  /* Main content */
+  #main{
+    margin-left:220px;
+    padding:80px 32px 32px;
+    max-width:none;
+    width:calc(100vw - 220px);
+    min-height:100vh;
+  }
+
+  /* Content area max width */
+  #pg-dash,#pg-pts,#pg-visits,#pg-pays,#pg-rems,#pg-rep{
+    max-width:900px;
+  }
+
+  /* Dashboard 2-column on large screens */
+  .kgrid{grid-template-columns:repeat(3,1fr)}
+  
+  /* Desktop modals */
+  .mov{
+    left:220px;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+  }
+  .mbox{
+    max-width:680px;
+    width:100%;
+    border-radius:16px;
+    max-height:calc(100vh - 40px);
+    margin:0;
+    animation:mup .2s ease;
+  }
+  .drag{display:none}
+  .mh{border-radius:16px 16px 0 0}
+  
+  /* Treatment cards side by side */
+  #v-active{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+  #v-active .tcard{margin-bottom:0}
+  
+  /* Patient list wider */
+  .pti{padding:14px 16px}
+  
+  /* Dashboard grid 3 cols */
+  .kgrid{grid-template-columns:repeat(3,1fr)}
+  
+  /* Dashboard 2-col layout */
+  #pg-dash .dash-cols{display:grid;grid-template-columns:1.2fr 1fr;gap:16px;align-items:start}
+  
+  /* Wider form fields */
+  .fg{grid-template-columns:1fr 1fr}
+}
+
+@media(min-width:1200px){
+  #main{padding:80px 48px 32px;}
+  #pg-dash,#pg-pts,#pg-visits,#pg-pays,#pg-rems,#pg-rep{max-width:1200px;}
+  #v-active{grid-template-columns:1fr 1fr 1fr}
+}
+
+
+</style>
+</head>
+<body>
+<!-- ══ AUTH SCREENS ══ -->
+<div class="asc" id="sc-setup">
+<div class="acard" style="max-width:520px">
+<div class="ahero" style="background:linear-gradient(135deg,#0d9488,#1e3a5f)">
+  <div style="font-size:32px;margin-bottom:8px">⚙️</div>
+  <h1>Ek Baar Setup</h1>
+  <p>Google Cloud mein free project banao — phir sirf Gmail se login!</p>
+</div>
+<div class="abody">
+  <div class="ss"><div class="sn">1</div><div class="sc"><h4>Google Cloud Console</h4><p><a href="https://console.cloud.google.com" target="_blank">console.cloud.google.com</a> → New Project → Create</p></div></div>
+  <div class="ss"><div class="sn">2</div><div class="sc"><h4>Google Drive API</h4><p>APIs & Services → Library → <span class="pill">Google Drive API</span> → Enable</p></div></div>
+  <div class="ss"><div class="sn">3</div><div class="sc"><h4>OAuth Consent</h4><p>OAuth consent screen → External → App name save karo</p></div></div>
+  <div class="ss"><div class="sn">4</div><div class="sc"><h4>Client ID</h4><p>Credentials → Create → OAuth Client ID → Web app → <strong>Client ID copy karo</strong></p></div></div>
+  <div class="ss"><div class="sn">5</div><div class="sc"><h4>Apps Script</h4><p><a href="https://script.google.com/create" target="_blank">script.google.com</a> → code paste → Deploy → <strong>URL copy karo</strong></p></div></div>
+  <div class="ss"><div class="sn">6</div><div class="sc">
+    <h4>Yahan Daalo</h4>
+    <div class="f" style="margin-bottom:8px"><label>OAuth Client ID</label><input id="s-cid" placeholder="123...apps.googleusercontent.com"></div>
+    <div class="f" style="margin-bottom:10px"><label>Apps Script URL</label><input id="s-url" placeholder="https://script.google.com/macros/s/.../exec"></div>
+    <div id="s-err" style="color:var(--r);font-size:11px;margin-bottom:8px"></div>
+    <button class="btn bt2 w" onclick="doSetup()">✅ Setup Complete</button>
+  </div></div>
+</div>
+<div class="afoot"><span>Demo dekhna hai?</span><a onclick="goDemo()">Demo Mode →</a></div>
+</div></div>
+
+<div class="asc off" id="sc-login">
+<div class="acard" style="text-align:center">
+<div class="ahero" style="background:linear-gradient(135deg,#0d9488,#2563eb)">
+  <div style="font-size:44px;margin-bottom:8px">🦷</div>
+  <h1>DentCare Pro</h1>
+  <p>Gmail se login karo — data aapki Drive mein safe rahega</p>
+</div>
+<div class="abody">
+  <p style="font-size:12px;color:var(--ink2);margin-bottom:16px;line-height:1.7">Pehli baar login pe admin approval hogi. Approve hote hi app seedha khulegi.</p>
+  <div id="gsi-btn" style="display:flex;justify-content:center;margin-bottom:10px"></div>
+  <button class="gbtn" onclick="doLogin()"><img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg">Google se Login</button>
+  <div style="margin-top:16px;text-align:left;font-size:12px;color:var(--ink2)">
+    <div style="padding:6px 0;border-bottom:1px solid #f1f5f9">🔒 Data sirf aapki Drive mein</div>
+    <div style="padding:6px 0;border-bottom:1px solid #f1f5f9">📱 Kisi bhi device pe access</div>
+    <div style="padding:6px 0">✅ Ek baar approve — hamesha access</div>
+  </div>
+</div>
+<div class="afoot"><span id="cid-prev" style="font-family:'JetBrains Mono',monospace;font-size:10px"></span><a onclick="resetSetup()">⚙️ Change Setup</a></div>
+</div></div>
+
+<div class="asc off" id="sc-clinic" style="padding:20px 16px">
+<div class="acard" style="max-width:520px">
+<div class="ahero" style="background:linear-gradient(135deg,#0d9488,#1e3a5f)">
+  <div style="font-size:30px;margin-bottom:8px">🏥</div>
+  <h1>Clinic Setup</h1>
+  <p>Ek baar karo — baad mein Settings mein change kar sakte ho</p>
+</div>
+<div class="abody">
+  <div class="ctabs">
+    <div class="ctab on" onclick="clTab('info',this)">🏥 Clinic Info</div>
+    <div class="ctab" onclick="clTab('fields',this)">📋 Fields</div>
+  </div>
+  <div id="cl-info">
+    <div class="fg">
+      <div class="f fl"><label>Clinic Naam *</label><input id="cl-cn" placeholder="Dr. Sharma Dental Clinic"></div>
+      <div class="f"><label>Doctor Naam *</label><input id="cl-dn" placeholder="Dr. Ramesh Sharma"></div>
+      <div class="f"><label>Specialty</label><input id="cl-sp" placeholder="Dental Surgeon"></div>
+      <div class="f"><label>Phone *</label><input id="cl-ph" type="tel" placeholder="9876543210"></div>
+      <div class="f"><label>WhatsApp</label><input id="cl-wa" type="tel" placeholder="9876543210"></div>
+      <div class="f fl"><label>Address</label><input id="cl-ad" placeholder="123 Main Road, Jaipur"></div>
+      <div class="f fl"><label>Google Review Link</label><input id="cl-rv" placeholder="https://g.page/r/..."></div>
+      <div class="f fl"><label>WA Language</label>
+        <div class="lrow" style="margin-top:5px">
+          <button class="lbtn on" id="cl-hi" onclick="setClLang('hi')">🇮🇳 Hindi</button>
+          <button class="lbtn" id="cl-en" onclick="setClLang('en')">🇬🇧 English</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="cl-fields" style="display:none">
+    <p style="font-size:12px;color:var(--ink2);margin-bottom:12px">Patient form mein kaun se fields dikhne chahiye?</p>
+    <div id="cl-flist"></div>
+  </div>
+  <div style="display:flex;gap:8px;margin-top:14px">
+    <button class="btn bg2" onclick="skipClinic()">Baad Mein</button>
+    <button class="btn bt2" style="flex:1" onclick="saveClinic()">✅ App Kholo!</button>
+  </div>
+</div>
+</div></div>
+
+<div class="asc off" id="sc-pend">
+<div class="acard" style="text-align:center">
+<div class="ahero" style="background:linear-gradient(135deg,#7c3aed,#2563eb)">
+  <h1>⏳ Approval Pending</h1>
+  <p>Admin approve karte hi app khul jaayegi</p>
+</div>
+<div class="abody">
+  <div class="pa">⏳</div>
+  <h3 style="font-size:14px;font-weight:700;margin-bottom:5px" id="pnd-nm">Namaste!</h3>
+  <p style="font-size:12px;color:var(--ink2);margin-bottom:16px;line-height:1.7">Aapka request admin ke paas gaya hai।</p>
+  <div style="text-align:left;margin-bottom:14px">
+    <div class="sit"><div class="sdot ok">✓</div><div><div style="font-weight:600;font-size:12px">Registered</div><div style="font-size:11px;color:var(--ink3)" id="pnd-em"></div></div></div>
+    <div class="sit"><div class="sdot ac">📧</div><div><div style="font-weight:600;font-size:12px">Admin ko email gayi</div></div></div>
+    <div class="sit"><div class="sdot wt">🔓</div><div><div style="font-weight:600;font-size:12px">Admin approval</div></div></div>
+    <div class="sit"><div class="sdot wt">🚀</div><div><div style="font-weight:600;font-size:12px">App access</div></div></div>
+  </div>
+  <div style="font-size:11px;color:var(--ink3)" id="pnd-st">🔄 Checking...</div>
+  <button onclick="doLogout()" style="margin-top:14px;padding:8px 16px;background:rgba(0,0,0,.06);border:none;border-radius:7px;font-size:12px;cursor:pointer;font-family:'Sora',sans-serif;color:var(--ink2)">← Wapas jao</button>
+</div>
+</div></div>
+
+<div class="asc off" id="sc-rej">
+<div class="acard" style="text-align:center">
+<div class="ahero" style="background:linear-gradient(135deg,#991b1b,#dc2626)">
+  <div style="font-size:40px;margin-bottom:8px">🚫</div>
+  <h1>Access Denied</h1><p>Admin ne reject kiya</p>
+</div>
+<div class="abody">
+  <p style="font-size:13px;color:var(--ink2);margin-bottom:14px;line-height:1.7" id="rej-msg">Access deny hua.</p>
+  <div class="wbox" style="margin-bottom:16px">💰 Pehle payment karein aur admin se contact karein।</div>
+  <button onclick="doLogout()" class="btn bd w">← Wapas Jao</button>
+</div>
+</div></div>
+
+<!-- ══ MAIN APP ══ -->
+<div id="app">
+  <div id="bar">
+    <div style="flex:1">
+      <div id="bar-title" style="font-size:14px;font-weight:700">Dashboard</div>
+      <div class="sp"><div class="sd of" id="sd"></div><span id="sl">Connecting</span></div>
+    </div>
+    <button class="bb pr" onclick="showPg('visits')" style="font-size:12px">+ Visit</button>
+    <button class="bb ic" onclick="doSync()">🔄</button>
+    <button class="bb ic" onclick="openSettings()">⚙️</button>
+  </div>
+
+  <div id="main">
+    <!-- DASHBOARD -->
+    <div class="page on" id="pg-dash">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:13px">
+        <div>
+          <div style="font-size:11px;color:var(--ink3)" id="d-date"></div>
+          <div style="font-size:16px;font-weight:800" id="d-clinic">DentCare</div>
+        </div>
+        <div id="d-avatar" style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--t),var(--b));color:#fff;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center">?</div>
+      </div>
+      <div class="kgrid" id="d-kpis"></div>
+      <div class="dash-cols">
+        <div>
+          <div class="card" style="margin-bottom:12px">
+            <div class="ch"><h3>📅 Aaj ke Visits</h3><button class="btn bt2 xs" onclick="showPg('visits')">+ New</button></div>
+            <div id="d-today"></div>
+          </div>
+          <div class="card" style="margin-bottom:12px">
+            <div class="ch"><h3>⚠️ Pending Dues</h3><button class="btn xs bg2" onclick="showPg('pays')">Sab →</button></div>
+            <div id="d-dues"></div>
+          </div>
+        </div>
+        <div>
+          <div class="card">
+            <div class="ch"><h3>🔔 Urgent Reminders</h3></div>
+            <div class="cb" id="d-rems"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PATIENTS -->
+    <div class="page" id="pg-pts">
+      <div class="swrap"><input id="pt-q" placeholder="Naam, phone, ID..." oninput="renderPts()"></div>
+      <div style="display:flex;gap:8px;margin-bottom:12px">
+        <button class="btn bt2" style="flex:1" onclick="openPtForm()">+ Naya Patient</button>
+        <button class="btn bg2 sm" onclick="openBulkWA()">📱 Bulk WA</button>
+      </div>
+      <div id="pt-list"></div>
+    </div>
+
+    <!-- VISITS (Main hub) -->
+    <div class="page" id="pg-visits">
+      <button class="btn bt2 w" style="padding:14px;font-size:14px;margin-bottom:14px" onclick="startVisit()">🏥 + Naya Visit / OPD</button>
+      <div class="stit">🦷 Active Treatments</div>
+      <div id="v-active"></div>
+      <div class="stit" style="margin-top:16px;opacity:.6">✅ Completed</div>
+      <div id="v-done"></div>
+    </div>
+
+    <!-- PAYMENTS -->
+    <div class="page" id="pg-pays">
+      <div class="dfw" id="pay-df"></div>
+      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap" id="pay-sum"></div>
+      <div id="pay-list"></div>
+    </div>
+
+    <!-- REMINDERS -->
+    <div class="page" id="pg-rems">
+      <div class="stit">📅 Next Sittings</div><div id="r-sits"></div>
+      <div class="stit" style="margin-top:16px">💰 Payment Dues</div><div id="r-pays"></div>
+      <div class="stit" style="margin-top:16px">🎂 Birthdays</div><div id="r-bdays"></div>
+      <div class="stit" style="margin-top:16px">📞 Follow-up Needed</div><div id="r-fup"></div>
+    </div>
+
+    <!-- REPORTS -->
+    <div class="page" id="pg-rep">
+      <div class="dfw" id="rep-df"></div>
+      <div class="kgrid" id="rep-kpis"></div>
+      <div class="card" style="margin-bottom:12px"><div class="ch"><h3>📈 Revenue</h3></div><div class="cb"><canvas id="rc" height="180"></canvas></div></div>
+      <div class="card" style="margin-bottom:12px"><div class="ch"><h3>🦷 Treatments</h3></div><div class="cb"><canvas id="tc" height="200"></canvas></div></div>
+      <div class="card"><div class="ch"><h3>💳 Payment Modes</h3></div><div class="cb"><canvas id="pc" height="200"></canvas></div></div>
+    </div>
+  </div>
+
+  <div id="bnav">
+    <div id="nav-logo" style="display:none;padding:0 4px 16px;border-bottom:1px solid var(--bd);margin-bottom:12px">
+      <div style="font-size:20px;margin-bottom:4px">🦷</div>
+      <div style="font-size:13px;font-weight:800;color:var(--ink)" id="nav-clinic">DentCare</div>
+      <div style="font-size:11px;color:var(--ink3)" id="nav-doctor">Doctor</div>
+    </div>
+    <button class="bn on" onclick="showPg('dash')"><span class="bi">🏠</span><span>Dashboard</span></button>
+    <button class="bn" onclick="showPg('pts')"><span class="bi">👥</span><span>Patients</span></button>
+    <button class="bn" onclick="showPg('visits')"><span class="bi">🦷</span><span>Visits & Treatments</span></button>
+    <button class="bn" onclick="showPg('pays')"><span class="bi">💳</span><span>Payments</span></button>
+    <button class="bn" onclick="showPg('rems')"><span class="bi">🔔</span><span>Reminders</span><span class="bbd" id="rb">0</span></button>
+    <div style="margin-top:auto;padding-top:16px;border-top:1px solid var(--bd);display:none" id="nav-footer">
+      <button class="btn bg2" style="width:100%;font-size:12px" onclick="openSettings()">⚙️ Settings</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODALS ══ -->
+<!-- Patient Select -->
+<div class="mov" id="m-ptsel">
+<div class="mbox"><div class="drag"></div>
+  <div class="mh"><h3>Patient Select Karo</h3><button class="mx" onclick="cM('m-ptsel')">✕</button></div>
+  <div class="mbody">
+    <div class="swrap"><input id="vs-q" placeholder="Naam ya phone..." oninput="vsSearch()"></div>
+    <div id="vs-list" style="max-height:50vh;overflow-y:auto"></div>
+    <button class="btn bg2 w" style="margin-top:10px" onclick="cM('m-ptsel');openPtForm(true)">+ Naya Patient Add Karo</button>
+  </div>
+</div></div>
+
+<!-- Visit / Examination + Type -->
+<div class="mov" id="m-visit">
+<div class="mbox" style="max-height:96vh"><div class="drag"></div>
+  <div class="mh">
+    <div><h3 id="mv-name">Patient</h3><div style="font-size:11px;color:var(--ink3)" id="mv-sub"></div></div>
+    <button class="mx" onclick="cM('m-visit')">✕</button>
+  </div>
+  <div class="mbody" id="mv-body"></div>
+</div></div>
+
+<!-- Add Sitting -->
+<div class="mov" id="m-sit">
+<div class="mbox"><div class="drag"></div>
+  <div class="mh"><h3 id="ms-title">Add Sitting</h3><button class="mx" onclick="cM('m-sit')">✕</button></div>
+  <div class="mbody" id="ms-body"></div>
+  <div class="mfoot" id="ms-foot"></div>
+</div></div>
+
+<!-- Patient Form -->
+<div class="mov" id="m-pt">
+<div class="mbox"><div class="drag"></div>
+  <div class="mh"><h3 id="mpf-title">Naya Patient</h3><button class="mx" onclick="cM('m-pt')">✕</button></div>
+  <div class="mbody">
+    <div class="fg">
+      <div class="f fl"><label>Poora Naam *</label><input id="pf-nm" placeholder="Rahul Sharma"></div>
+      <div class="f"><label>Phone *</label><input id="pf-ph" type="tel" placeholder="9876543210"></div>
+      <div class="f"><label>WhatsApp</label><input id="pf-wa" type="tel" placeholder="Same ya alag"></div>
+      <div id="pf-dyn"></div>
+    </div>
+  </div>
+  <div class="mfoot">
+    <button class="btn bg2" onclick="cM('m-pt')">Cancel</button>
+    <button class="btn bwa" onclick="savePt(true)">💾 Save + WA Card</button>
+    <button class="btn bt2" style="flex:1" onclick="savePt(false)">💾 Save</button>
+  </div>
+</div></div>
+
+<!-- WhatsApp -->
+<div class="mov" id="m-wa">
+<div class="mbox"><div class="drag"></div>
+  <div class="mh"><h3 id="wa-title">WhatsApp</h3><button class="mx" onclick="cM('m-wa')">✕</button></div>
+  <div class="mbody">
+    <div class="lrow">
+      <button class="lbtn on" id="wa-hi" onclick="setWAL('hi')">🇮🇳 Hindi</button>
+      <button class="lbtn" id="wa-en" onclick="setWAL('en')">🇬🇧 English</button>
+    </div>
+    <div class="waw"><div class="wabb" id="wa-msg"></div></div>
+    <div style="font-size:11px;color:var(--ink2);margin-top:8px" id="wa-to"></div>
+  </div>
+  <div class="mfoot">
+    <button class="btn bg2" onclick="cM('m-wa')">Cancel</button>
+    <button class="btn bwa w" onclick="sendWA()">📱 WhatsApp Bhejo</button>
+  </div>
+</div></div>
+
+<!-- Payment -->
+<div class="mov" id="m-pay">
+<div class="mbox"><div class="drag"></div>
+  <div class="mh"><h3 id="mpay-title">Payment</h3><button class="mx" onclick="cM('m-pay')">✕</button></div>
+  <div class="mbody" id="mpay-body"></div>
+  <div class="mfoot">
+    <button class="btn bg2" onclick="cM('m-pay')">Cancel</button>
+    <button class="btn bwa" onclick="savePay(true)">💾 Save + WA</button>
+    <button class="btn bt2" style="flex:1" onclick="savePay(false)">💾 Save</button>
+  </div>
+</div></div>
+
+<!-- Settings -->
+<div class="mov" id="m-set">
+<div class="mbox" style="max-height:96vh"><div class="drag"></div>
+  <div class="mh"><h3>⚙️ Settings</h3><button class="mx" onclick="cM('m-set')">✕</button></div>
+  <div class="mbody">
+    <div class="stit">🏥 Clinic Info</div>
+    <div class="fg" style="margin-bottom:13px">
+      <div class="f fl"><label>Clinic Naam</label><input id="st-cn"></div>
+      <div class="f"><label>Doctor</label><input id="st-dn"></div>
+      <div class="f"><label>Specialty</label><input id="st-sp"></div>
+      <div class="f"><label>Phone</label><input id="st-ph" type="tel"></div>
+      <div class="f"><label>WhatsApp</label><input id="st-wa" type="tel"></div>
+      <div class="f fl"><label>Address</label><input id="st-ad"></div>
+      <div class="f fl"><label>Review Link</label><input id="st-rv"></div>
+    </div>
+    <button class="btn bt2 w" onclick="saveClInfo()" style="margin-bottom:13px">💾 Save Info</button>
+    <div class="div"></div>
+    <div class="stit">🌐 WA Language</div>
+    <div class="lrow" style="margin-bottom:13px">
+      <button class="lbtn on" id="st-hi" onclick="setStLang('hi')">🇮🇳 Hindi</button>
+      <button class="lbtn" id="st-en" onclick="setStLang('en')">🇬🇧 English</button>
+    </div>
+    <div class="div"></div>
+    <div class="stit">📋 Patient Form Fields</div>
+    <div id="st-flds" style="margin-bottom:13px"></div>
+    <button class="btn bt2 w" onclick="saveFields()" style="margin-bottom:13px">💾 Save Fields</button>
+    <div class="div"></div>
+    <div style="display:flex;gap:8px;margin-bottom:13px">
+      <button class="btn bg2" style="flex:1" onclick="doBackup()">⬇ Backup</button>
+      <button class="btn bg2" style="flex:1" onclick="doSync()">🔄 Sync</button>
+    </div>
+    <button class="btn bd w" onclick="doLogout()">🚪 Logout</button>
+  </div>
+</div></div>
+
+<!-- Bulk WA -->
+<div class="mov" id="m-bulk">
+<div class="mbox"><div class="drag"></div>
+  <div class="mh"><h3>📱 Bulk WhatsApp</h3><button class="mx" onclick="cM('m-bulk')">✕</button></div>
+  <div class="mbody">
+    <div class="lrow">
+      <button class="lbtn on" id="bwa-hi" onclick="setBL('hi')">🇮🇳 Hindi</button>
+      <button class="lbtn" id="bwa-en" onclick="setBL('en')">🇬🇧 English</button>
+    </div>
+    <div class="f fl" style="margin-bottom:10px"><label>Message</label><textarea id="bwa-msg" rows="3" placeholder="Message likhо..."></textarea></div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">
+      <button class="btn xs bg2" onclick="setBTmpl('offer')">🎁 Offer</button>
+      <button class="btn xs bg2" onclick="setBTmpl('recall')">📅 Recall</button>
+      <button class="btn xs bg2" onclick="setBTmpl('festival')">🎉 Festival</button>
+    </div>
+    <button class="btn bwa w" onclick="genBulk()">📱 List Generate Karo</button>
+    <div id="bulk-list" style="margin-top:12px;max-height:260px;overflow-y:auto"></div>
+  </div>
+</div></div>
+
+<div id="toast"></div>
+<script>
+// ════════════════════════════════════════════════════════════
+// CONFIG & STATE
+// ════════════════════════════════════════════════════════════
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz4HkBwyqy7bW_amZ0mvsEtCyPjpC-WCsSUDn0kdddN3IDFW1H6aj9zJSfylmwNON5ypA/exec';
+const CLIENT_ID  = '344938253365-ddneeofor5f894p2l5bp8fgp31qor6f6.apps.googleusercontent.com';
+
+let _user=null, _demo=false, _cid='', _surl='';
+let _pollT=null, _syncT=null, _saveT=null;
+let _page='dash', _lang='hi', _blang='hi', _clang='hi';
+let _editPid=null, _curPid=null, _curTxId=null, _payCtx=null;
+let _waMsg='', _waPhone='', _waData=null;
+let _dfPay='all', _dfRep='month';
+let _charts={};
+
+let S={patients:[],treatments:[],sittings:[],payments:[],visits:[]};
+let CS={clinicName:'DentCare Clinic',doctorName:'Doctor',specialty:'Dental Surgeon',phone:'',whatsapp:'',address:'',reviewLink:'',lang:'hi'};
+let FS={age:true,gender:true,blood:true,dob:true,email:false,address:true,medical:true,allergy:true,ref:false};
+
+const FDEFS=[
+  {k:'age',l:'Age',t:'number'},{k:'gender',l:'Gender',t:'select',o:['Male','Female','Other']},
+  {k:'blood',l:'Blood Group',t:'select',o:['','A+','A-','B+','B-','O+','O-','AB+','AB-']},
+  {k:'dob',l:'Date of Birth',t:'date'},{k:'email',l:'Email',t:'email'},
+  {k:'address',l:'Address',t:'text'},{k:'medical',l:'Medical History',t:'textarea'},
+  {k:'allergy',l:'Allergies',t:'text'},{k:'ref',l:'Referred By',t:'text'},
+];
+const OPD_TX=['Consultation','Scaling & Polishing','Composite Filling','Extraction','X-Ray','Fluoride Treatment','Teeth Whitening','Dressing','Emergency Treatment','Other'];
+const LONG_TX=['Root Canal (RCT)','RCT + Crown','Crown Fitting','Orthodontic Treatment (Braces)','Full Denture','Partial Denture','Dental Implant','Periodontal Treatment','Multiple Fillings','Other'];
+
+// ════════════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════════════
+window.addEventListener('resize', function(){updateBar();});
+window.onload=function(){
+  loadLocal();
+  buildClFields(); buildStFields();
+  _cid=localStorage.getItem('dc_cid')||CLIENT_ID;
+  _surl=localStorage.getItem('dc_url')||SCRIPT_URL;
+  if(!_cid||!_surl){showS('sc-setup');return;}
+  showS('sc-login');
+  var el=gi('cid-prev');if(el)el.textContent=_cid.substring(0,22)+'...';
+  initGIS();
+};
+
+function loadLocal(){
+  try{var c=localStorage.getItem('dc_cs');if(c)CS=Object.assign({},CS,JSON.parse(c));}catch(e){}
+  try{var f=localStorage.getItem('dc_fs');if(f)FS=Object.assign({},FS,JSON.parse(f));}catch(e){}
+  _lang=localStorage.getItem('dc_lang')||'hi';
+  ['patients','treatments','sittings','payments','visits'].forEach(function(k){
+    try{var d=localStorage.getItem('dc_'+k);if(d)S[k]=JSON.parse(d);}catch(e){}
+  });
+}
+
+function saveLocal(){
+  localStorage.setItem('dc_cs',JSON.stringify(CS));
+  localStorage.setItem('dc_fs',JSON.stringify(FS));
+  localStorage.setItem('dc_lang',_lang);
+}
+
+// ════════════════════════════════════════════════════════════
+// UTILS
+// ════════════════════════════════════════════════════════════
+function gi(id){return document.getElementById(id);}
+function td(){return new Date().toISOString().split('T')[0];}
+function fmt(d){
+  if(!d)return'—';
+  try{var p=d.split('-');return p[2]+' '+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][+p[1]-1]+' '+p[0];}catch(e){return d;}
+}
+function inr(n){return '₹'+(n||0).toLocaleString('en-IN');}
+function dl(d){if(!d)return null;return Math.round((new Date(d)-new Date(td()))/86400000);}
+function pname(id){var p=S.patients.find(function(x){return x.id==id;});return p?p.name:'?';}
+function pphone(id){var p=S.patients.find(function(x){return x.id==id;});return p?(p.whatsapp||p.phone):'';}
+function nid(){
+  var yr=new Date().getFullYear();
+  var same=S.patients.filter(function(x){return (x.id+'').startsWith(yr+'-');});
+  return yr+'-'+String(same.length+1).padStart(3,'0');
+}
+function sb(s){
+  var m={Completed:'bg',Paid:'bg',Active:'bb2',OPD:'bt',Pending:'br2',Cancelled:'bgg','On Hold':'ba',Partial:'ba'};
+  return '<span class="bge '+(m[s]||'bgg')+'">'+s+'</span>';
+}
+function toast(msg,d){
+  var t=gi('toast');t.textContent=msg;t.classList.add('on');
+  setTimeout(function(){t.classList.remove('on');},(d||2600));
+}
+function oM(id){var el=gi(id);if(el)el.classList.add('on');}
+function cM(id){var el=gi(id);if(el)el.classList.remove('on');}
+document.addEventListener('click',function(e){
+  if(e.target.classList.contains('mov'))e.target.classList.remove('on');
+});
+
+// ════════════════════════════════════════════════════════════
+// AUTH SCREENS
+// ════════════════════════════════════════════════════════════
+function showS(id){
+  document.querySelectorAll('.asc').forEach(function(el){el.classList.add('off');});
+  var el=gi(id);if(el)el.classList.remove('off');
+}
+
+function doSetup(){
+  var cid=(gi('s-cid')||{}).value||'',url=(gi('s-url')||{}).value||'';
+  var err=gi('s-err');
+  if(!cid.includes('apps.googleusercontent.com')){if(err)err.textContent='❌ Sahi Client ID daalo';return;}
+  if(!url.includes('script.google.com')){if(err)err.textContent='❌ Sahi Apps Script URL daalo';return;}
+  _cid=cid;_surl=url;
+  localStorage.setItem('dc_cid',cid);localStorage.setItem('dc_url',url);
+  showS('sc-login');
+  var el=gi('cid-prev');if(el)el.textContent=cid.substring(0,22)+'...';
+  initGIS();toast('✅ Setup saved!');
+}
+
+function resetSetup(){
+  localStorage.removeItem('dc_cid');localStorage.removeItem('dc_url');
+  _cid='';_surl='';showS('sc-setup');
+}
+
+function clTab(t,el){
+  document.querySelectorAll('.ctab').forEach(function(b){b.classList.remove('on');});
+  el.classList.add('on');
+  gi('cl-info').style.display=t==='info'?'':'none';
+  gi('cl-fields').style.display=t==='fields'?'':'none';
+}
+
+function setClLang(l){
+  _clang=l;
+  gi('cl-hi').classList.toggle('on',l==='hi');
+  gi('cl-en').classList.toggle('on',l==='en');
+}
+
+function buildClFields(){
+  var el=gi('cl-flist');if(!el)return;
+  el.innerHTML=FDEFS.map(function(f){
+    return '<div class="trow"><label for="clf-'+f.k+'">'+f.l+'</label>'+
+      '<label class="tog"><input type="checkbox" id="clf-'+f.k+'" '+(FS[f.k]?'checked':'')+'>'+
+      '<span class="tsl"></span></label></div>';
+  }).join('');
+}
+
+function saveClinic(){
+  var cn=(gi('cl-cn')||{}).value||'',dn=(gi('cl-dn')||{}).value||'';
+  if(!cn||!dn){toast('❌ Clinic naam aur Doctor naam zaroori!');return;}
+  CS.clinicName=cn;CS.doctorName=dn;CS.specialty=(gi('cl-sp')||{}).value||'';
+  CS.phone=(gi('cl-ph')||{}).value||'';CS.whatsapp=(gi('cl-wa')||{}).value||'';
+  CS.address=(gi('cl-ad')||{}).value||'';CS.reviewLink=(gi('cl-rv')||{}).value||'';
+  CS.lang=_clang;_lang=_clang;
+  FDEFS.forEach(function(f){var el=gi('clf-'+f.k);if(el)FS[f.k]=el.checked;});
+  localStorage.setItem('dc_clinic_done','1');
+  saveLocal();enterApp();
+}
+function skipClinic(){localStorage.setItem('dc_clinic_done','1');enterApp();}
+
+function goDemo(){
+  _demo=true;_user={name:'Demo Doctor',email:'demo@dentcare.app',picture:''};
+  CS.clinicName='Demo Dental Clinic';CS.doctorName='Demo Doctor';
+  if(!localStorage.getItem('dc_clinic_done')){showS('sc-clinic');buildClFields();return;}
+  enterApp();seedDemo();renderCurPg();
+}
+
+// GIS
+function initGIS(){
+  if(!_cid)return;
+  var try2=function(){
+    if(typeof google==='undefined'||!google.accounts){setTimeout(try2,300);return;}
+    try{
+      window._tc=google.accounts.oauth2.initTokenClient({
+        client_id:_cid,
+        scope:'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email',
+        callback:handleToken
+      });
+      google.accounts.id.initialize({client_id:_cid,callback:function(){doLogin();},auto_select:false});
+      google.accounts.id.renderButton(gi('gsi-btn'),{theme:'outline',size:'large',width:240});
+    }catch(e){}
+  };
+  try2();
+}
+
+function doLogin(){
+  if(!window._tc){toast('⏳ Loading...');return;}
+  window._tc.requestAccessToken({prompt:'consent'});
+}
+
+async function handleToken(r){
+  if(r.error){toast('❌ '+r.error);return;}
+  try{
+    var res=await fetch('https://www.googleapis.com/oauth2/v3/userinfo',{headers:{Authorization:'Bearer '+r.access_token}});
+    var info=await res.json();
+    _user={name:info.name,email:info.email,picture:info.picture||''};
+    await doRegister();
+  }catch(e){toast('❌ Login fail');}
+}
+
+// API
+async function api(p){
+  try{
+    var r=await fetch(_surl+'?'+new URLSearchParams(p).toString());
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    return await r.json();
+  }catch(e){return{error:e.message};}
+}
+async function apiSave(data){
+  try{
+    var r=await fetch(_surl+'?action=save&email='+encodeURIComponent(_user.email)+'&data='+encodeURIComponent(JSON.stringify(data)));
+    if(!r.ok)throw new Error();
+    return await r.json();
+  }catch(e){return{error:1};}
+}
+
+async function doRegister(){
+  showS('sc-pend');
+  gi('pnd-nm').textContent='Namaste, '+_user.name+'!';
+  gi('pnd-em').textContent=_user.email;
+  var r=await api({action:'register',email:_user.email,name:_user.name});
+  if(r.error){toast('❌ '+r.error);return;}
+  if(r.status==='approved')await loadAndEnter();
+  else if(r.status==='pending')startPoll();
+  else{gi('rej-msg').textContent=r.message||'Access deny.';showS('sc-rej');}
+}
+
+function startPoll(){
+  var c=0;
+  _pollT=setInterval(async function(){
+    c++;gi('pnd-st').textContent='🔄 Check #'+c;
+    var r=await api({action:'check',email:_user.email});
+    if(r.status==='approved'){clearInterval(_pollT);await loadAndEnter();}
+    else if(r.status==='rejected'){clearInterval(_pollT);gi('rej-msg').textContent=r.reason||'Access deny.';showS('sc-rej');}
+  },5000);
+}
+
+async function loadAndEnter(){
+  if(_pollT)clearInterval(_pollT);
+  var r=await api({action:'load',email:_user.email});
+  if(!r.error){
+    ['patients','treatments','sittings','payments','visits'].forEach(function(k){
+      if(Array.isArray(r[k]))S[k]=r[k];
+    });
+  }
+  if(S.patients.length===0&&!localStorage.getItem('seeded_'+_user.email)){
+    seedDemo();
+    localStorage.setItem('seeded_'+_user.email,'1');
+    await apiSave(S);
+  }
+  if(!localStorage.getItem('dc_clinic_done')){showS('sc-clinic');buildClFields();return;}
+  enterApp();
+}
+
+function enterApp(){
+  document.querySelectorAll('.asc').forEach(function(el){el.classList.add('off');});
+  gi('app').classList.add('on');
+  updateBar();
+  if(_user){
+    var av=gi('d-avatar');
+    if(av&&_user.picture){
+      av.innerHTML='<img src="'+_user.picture+'" style="width:36px;height:36px;border-radius:50%;object-fit:cover">';
+    } else if(av){
+      av.textContent=(_user.name||'?')[0].toUpperCase();
+    }
+  }
+  setSS('ok','Connected');
+  renderCurPg();
+  if(!_demo)startAutoSync();
+  toast('✅ Welcome! 🦷');
+}
+
+function updateBar(){
+  var isDesktop=window.innerWidth>=900;
+  var nl=gi('nav-logo'),nf=gi('nav-footer');
+  if(nl)nl.style.display=isDesktop?'block':'none';
+  if(nf)nf.style.display=isDesktop?'block':'none';
+  var nc=gi('nav-clinic'),nd=gi('nav-doctor');
+  if(nc)nc.textContent=CS.clinicName||'DentCare';
+  if(nd)nd.textContent=CS.doctorName||'Doctor';
+  var d=gi('d-date'),c=gi('d-clinic');
+  if(d)d.textContent=new Date().toLocaleDateString('hi-IN',{weekday:'long',day:'numeric',month:'long'});
+  if(c)c.textContent=CS.clinicName||'DentCare';
+  document.title='🦷 '+(CS.clinicName||'DentCare');
+}
+
+function doLogout(){
+  if(_pollT)clearInterval(_pollT);if(_syncT)clearInterval(_syncT);
+  _user=null;_demo=false;
+  document.querySelectorAll('.asc').forEach(function(el){el.classList.add('off');});
+  gi('app').classList.remove('on');
+  showS('sc-login');toast('👋 Logout!');
+}
+
+// Drive sync
+function dbSave(k,d){
+  S[k]=d;
+  localStorage.setItem('dc_'+k,JSON.stringify(d));
+  setSS('ok','Saved locally');
+  clearTimeout(_saveT);
+  _saveT=setTimeout(function(){
+    if(!_demo&&_user){
+      setSS('sy','Saving...');
+      apiSave(S).then(function(r){
+        if(r&&r.success){setSS('ok','Synced ✓');}
+        else{setSS('er','Drive save failed — local ok');}
+      }).catch(function(){setSS('er','No internet — local ok');});
+    }
+  },1200);
+}
+async function doSync(){
+  if(_demo){toast('Demo — sync nahi');return;}
+  setSS('sy','Syncing...');
+  var r=await api({action:'load',email:_user.email});
+  if(r.error){setSS('er','Sync Failed');toast('❌ Sync fail — internet check karo');return;}
+  ['patients','treatments','sittings','payments','visits'].forEach(function(k){if(Array.isArray(r[k]))S[k]=r[k];});
+  setSS('ok','Synced');
+  renderCurPg();toast('✅ Synced!');
+}
+function startAutoSync(){
+  if(_syncT)clearInterval(_syncT);
+  _syncT=setInterval(function(){if(!_demo&&_user)doSync();},30000);
+}
+function setSS(st,msg){
+  var d=gi('sd'),l=gi('sl');
+  if(d)d.className='sd '+st;if(l)l.textContent=msg;
+}
+
+// ════════════════════════════════════════════════════════════
+// NAVIGATION
+// ════════════════════════════════════════════════════════════
+var TITLES={dash:'Dashboard',pts:'Patients 👥',visits:'Visits & Treatments 🦷',pays:'Payments 💳',rems:'Reminders 🔔',rep:'Reports 📊'};
+
+function showPg(p){
+  _page=p;
+  document.querySelectorAll('.page').forEach(function(x){x.classList.remove('on');});
+  document.querySelectorAll('.bn').forEach(function(x){x.classList.remove('on');});
+  var pg=gi('pg-'+p);if(pg)pg.classList.add('on');
+  document.querySelectorAll('.bn').forEach(function(x){
+    if((x.getAttribute('onclick')||'').includes("'"+p+"'"))x.classList.add('on');
+  });
+  var bt=gi('bar-title');if(bt)bt.textContent=TITLES[p]||p;
+  renderCurPg();
+}
+
+function renderCurPg(){
+  var r={dash:renderDash,pts:renderPts,visits:renderVisits,pays:renderPays,rems:renderRems,rep:renderRep};
+  if(r[_page])r[_page]();
+  updateBadge();
+}
+
+function updateBadge(){
+  var c=0;
+  S.sittings.forEach(function(s){var d=dl(s.nextDate);if(d!==null&&d>=0&&d<=7&&s.status==='Upcoming')c++;});
+  S.payments.forEach(function(p){var d=dl(p.dueDate);if(d!==null&&d>=0&&d<=7&&p.status==='Pending')c++;});
+  var b=gi('rb');if(b){b.textContent=c;b.style.display=c?'block':'none';}
+  var bi=document.querySelector('.bn:last-child');if(bi)bi.classList.toggle('hb',c>0);
+}
+
+// ════════════════════════════════════════════════════════════
+// DASHBOARD
+// ════════════════════════════════════════════════════════════
+function renderDash(){
+  updateBar();
+  var now=td(),mStr=now.substring(0,7);
+  var active=S.treatments.filter(function(t){return t.status==='Active';});
+  var pendPays=S.payments.filter(function(p){return p.status==='Pending';});
+  var mRev=S.payments.filter(function(p){return p.status==='Paid'&&(p.payDate||'').startsWith(mStr);}).reduce(function(s,p){return s+p.amount;},0);
+  var todayV=S.visits.filter(function(v){return v.date===now;});
+  var overdue=S.payments.filter(function(p){return p.status==='Pending'&&p.dueDate&&p.dueDate<now;});
+
+  var kg=gi('d-kpis');
+  if(kg)kg.innerHTML=
+    mkKPI('t','👥',S.patients.length,'Patients',"showPg('pts')")+
+    mkKPI('b','📅',todayV.length,'Aaj Visits',"showPg('visits')")+
+    mkKPI('g','💰',inr(mRev),'Is Mahine',"showPg('pays')")+
+    mkKPI('r','⚠️',inr(pendPays.reduce(function(s,p){return s+(p.totalFee-p.amount);},0)),'Pending',"showPg('pays')")+
+    mkKPI('a','🦷',active.length,'Active Tx',"showPg('visits')")+
+    mkKPI('p','🔴',overdue.length,'Overdue',"showPg('rems')");
+
+  // Today visits
+  var dt=gi('d-today');
+  if(dt){
+    if(!todayV.length){dt.innerHTML='<div class="empty" style="padding:18px"><div class="ei">😌</div><p>Aaj koi visit nahi</p></div>';}
+    else{dt.innerHTML='<div style="padding:0 14px">'+todayV.map(function(v){
+      return '<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #f1f5f9">'+
+        '<div style="flex:1"><div style="font-weight:700;font-size:12px">'+pname(v.patientId)+'</div>'+
+        '<div style="font-size:11px;color:var(--ink2)">'+(v.type==='OPD'?'🏥 OPD':'🦷 Treatment')+' · '+(v.treatment||'')+'</div></div>'+
+        sb(v.status||'Active')+'</div>';}).join('')+'</div>';}
+  }
+
+  // Dues
+  var dd=gi('d-dues');
+  if(dd){
+    if(!pendPays.length){dd.innerHTML='<div class="empty" style="padding:18px"><div class="ei">✅</div><p>Koi pending nahi!</p></div>';}
+    else{dd.innerHTML='<div style="padding:0 14px">'+pendPays.slice(0,4).map(function(p){
+      var d2=dl(p.dueDate),bal=p.totalFee-p.amount;
+      var dc=d2!==null&&d2<0?'var(--r)':d2<=3?'var(--a)':'var(--ink3)';
+      return '<div style="display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid #f1f5f9">'+
+        '<div style="flex:1"><div style="font-weight:700;font-size:12px">'+pname(p.patientId)+'</div>'+
+        '<div style="font-size:11px;color:var(--ink2)">'+p.treatment+'</div></div>'+
+        '<div style="text-align:right"><div class="mn r" style="font-size:13px">'+inr(bal)+'</div>'+
+        '<div style="font-size:10px;color:'+dc+'">'+fmt(p.dueDate)+'</div></div>'+
+        mkWABtn("openPayWA('"+p.id+"')",'📱')+'</div>';}).join('')+'</div>';}
+  }
+
+  // Reminders strip
+  var dr=gi('d-rems');
+  if(dr){
+    var urgs=[];
+    S.sittings.forEach(function(s){
+      var d2=dl(s.nextDate);
+      if(d2!==null&&d2>=0&&d2<=3&&s.status==='Upcoming'){
+        var tx=S.treatments.find(function(t){return t.id===s.treatmentId;});
+        urgs.push({name:pname(tx&&tx.patientId),detail:'Next sitting: '+fmt(s.nextDate),d2:d2,type:'sit'});
+      }
+    });
+    S.payments.forEach(function(p){
+      var d2=dl(p.dueDate);
+      if(d2!==null&&d2>=0&&d2<=3&&p.status==='Pending')
+        urgs.push({name:pname(p.patientId),detail:'Due: '+inr(p.totalFee-p.amount)+' · '+fmt(p.dueDate),d2:d2,type:'pay',id:p.id});
+    });
+    urgs.sort(function(a,b){return a.d2-b.d2;});
+    if(!urgs.length){dr.innerHTML='<div style="color:var(--g);font-size:12px">✅ Koi urgent reminder nahi</div>';}
+    else{dr.innerHTML=urgs.map(function(u){
+      var dot=u.d2===0?'var(--r)':u.d2<=1?'var(--r)':'var(--a)';
+      var lbl=u.d2===0?'TODAY':u.d2+'d';
+      return '<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid #f1f5f9">'+
+        '<div style="width:7px;height:7px;border-radius:50%;background:'+dot+';flex-shrink:0"></div>'+
+        '<div style="flex:1"><div style="font-weight:600;font-size:12px">'+u.name+'</div>'+
+        '<div style="font-size:11px;color:var(--ink2)">'+u.detail+'</div></div>'+
+        '<div style="font-size:10px;font-weight:700;color:'+dot+'">'+lbl+'</div>'+
+        (u.type==='pay'?mkWABtn("openPayWA('"+u.id+"')",'📱'):'')+'</div>';
+    }).join('');}
+  }
+}
+
+function mkKPI(cl,ico,val,lbl,onclick){
+  return '<div class="kpi '+cl+'" onclick="'+onclick+'"><div class="kico">'+ico+'</div><div class="kval">'+val+'</div><div class="klbl">'+lbl+'</div></div>';
+}
+function mkWABtn(fn,lbl){
+  return '<button onclick="'+fn+'" style="background:#25d366;color:#fff;border:none;border-radius:7px;padding:5px 9px;font-size:11px;cursor:pointer;font-family:Sora,sans-serif;font-weight:600;flex-shrink:0">'+lbl+'</button>';
+}
+
+// ════════════════════════════════════════════════════════════
+// PATIENTS
+// ════════════════════════════════════════════════════════════
+function renderPts(){
+  var q=((gi('pt-q')||{}).value||'').toLowerCase();
+  var pts=S.patients.filter(function(p){return p.name.toLowerCase().includes(q)||p.phone&&p.phone.includes(q)||(p.id+'').includes(q);});
+  var el=gi('pt-list');if(!el)return;
+  if(!pts.length){el.innerHTML='<div class="empty"><div class="ei">👥</div><p>Koi patient nahi mila</p></div>';return;}
+  el.innerHTML=pts.map(function(p){
+    var active=S.treatments.filter(function(t){return t.patientId==p.id&&t.status==='Active';}).length;
+    return '<div class="pti" onclick="openPtDetail(\''+p.id+'\')" >'+
+      '<div class="ptav">'+p.name[0].toUpperCase()+'</div>'+
+      '<div style="flex:1;min-width:0">'+
+        '<div style="font-weight:700;font-size:13px">'+p.name+'</div>'+
+        '<div style="font-size:11px;color:var(--ink2);margin-top:2px">'+p.id+' · '+p.phone+(p.blood?' · '+p.blood:'')+'</div>'+
+        (active?'<div style="font-size:10px;color:var(--t);margin-top:2px">🦷 '+active+' active treatment</div>':'')+
+      '</div><div style="color:var(--ink3)">›</div></div>';
+  }).join('');
+}
+
+function openPtDetail(pid){
+  var p=S.patients.find(function(x){return x.id==pid;});if(!p)return;
+  _curPid=pid;
+  var txs=S.treatments.filter(function(t){return t.patientId==pid;});
+  var totalPaid=S.payments.filter(function(py){return py.patientId==pid&&py.status==='Paid';}).reduce(function(s,py){return s+py.amount;},0);
+  var totalPend=S.payments.filter(function(py){return py.patientId==pid&&py.status==='Pending';}).reduce(function(s,py){return s+(py.totalFee-py.amount);},0);
+
+  var mv=gi('mv-name'),ms=gi('mv-sub');
+  if(mv)mv.textContent=p.name;
+  if(ms)ms.textContent=p.id+' · '+p.phone;
+
+  var mb=gi('mv-body');if(!mb)return;
+  mb.innerHTML=
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:13px">'+
+    '<div class="card" style="padding:10px"><div style="font-size:10px;color:var(--ink3);font-weight:600">Total Paid</div><div class="mn g" style="font-size:16px">'+inr(totalPaid)+'</div></div>'+
+    '<div class="card" style="padding:10px"><div style="font-size:10px;color:var(--ink3);font-weight:600">Pending</div><div class="mn r" style="font-size:16px">'+inr(totalPend)+'</div></div>'+
+    '</div>'+
+    '<div style="font-size:12px;color:var(--ink2);margin-bottom:12px;line-height:2">'+
+    (p.phone?'📱 '+p.phone+'<br>':'')+
+    (p.dob?'🎂 '+fmt(p.dob)+'<br>':'')+
+    (p.blood?'🩸 '+p.blood+'<br>':'')+
+    (p.medical&&p.medical!='None'?'🏥 '+p.medical+'<br>':'')+
+    (p.allergy&&p.allergy!='None'?'⚠️ Allergy: '+p.allergy+'<br>':'')+
+    '</div>'+
+    (txs.length?'<div class="stit">Treatments</div>'+txs.map(function(t){
+      var paid2=S.payments.filter(function(py){return py.treatmentId==t.id&&py.status==='Paid';}).reduce(function(s,py){return s+py.amount;},0);
+      var pct=t.totalSittings?Math.round(t.doneSittings/t.totalSittings*100):0;
+      return '<div style="border:1px solid var(--bd);border-radius:10px;padding:12px;margin-bottom:9px;background:#fff">'+
+        '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">'+
+        '<div style="flex:1"><div style="font-weight:700;font-size:13px">'+t.treatment+'</div>'+
+        '<div style="font-size:11px;color:var(--ink2)">'+t.doneSittings+'/'+t.totalSittings+' · '+inr(paid2)+'/'+inr(t.totalFee)+'</div></div>'+
+        sb(t.status)+'</div>'+
+        '<div class="prog"><div class="pfil" style="width:'+pct+'%"></div></div></div>';
+    }).join(''):'')+
+    '<div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">'+
+    '<button class="btn bt2" style="flex:1" onclick="cM(\'m-visit\');startVisitForPt(\''+pid+'\')">🏥 New Visit</button>'+
+    '<button class="btn bwa" onclick="openPtCardWA(\''+pid+'\')">📱 WA Card</button>'+
+    '<button class="btn bg2 sm" onclick="openPtForm(false,\''+pid+'\')">✏️ Edit</button>'+
+    '</div>';
+  oM('m-visit');
+  setTimeout(function(){var mb2=document.querySelector('#m-visit .mbox');if(mb2)mb2.scrollTop=0;},50);
+}
+
+function openPtForm(afterVisit,editId){
+  _editPid=editId||null;
+  var p=editId?S.patients.find(function(x){return x.id==editId;}):null;
+  var t=gi('mpf-title');if(t)t.textContent=editId?'Patient Edit':'Naya Patient';
+  var fn=gi('pf-nm'),fp=gi('pf-ph'),fw=gi('pf-wa');
+  if(fn)fn.value=p?p.name||'':'';
+  if(fp)fp.value=p?p.phone||'':'';
+  if(fw)fw.value=p?p.whatsapp||'':'';
+  var html='';
+  FDEFS.forEach(function(f){
+    if(!FS[f.k])return;
+    var val=p?p[f.k]||'':'';
+    if(f.t==='select'){
+      html+='<div class="f"><label>'+f.l+'</label><select id="pf-'+f.k+'">'+f.o.map(function(o){return '<option'+(o===val?' selected':'')+'>'+o+'</option>';}).join('')+'</select></div>';
+    }else if(f.t==='textarea'){
+      html+='<div class="f fl"><label>'+f.l+'</label><textarea id="pf-'+f.k+'">'+val+'</textarea></div>';
+    }else{
+      html+='<div class="f"><label>'+f.l+'</label><input id="pf-'+f.k+'" type="'+f.t+'" value="'+val+'" placeholder="'+f.l+'"></div>';
+    }
+  });
+  var d=gi('pf-dyn');if(d)d.innerHTML='<div class="fg" style="grid-column:1/-1;margin-top:0">'+html+'</div>';
+  oM('m-pt');
+}
+
+function savePt(withWA){
+  var name=((gi('pf-nm')||{}).value||'').trim();
+  var phone=((gi('pf-ph')||{}).value||'').trim();
+  if(!name||!phone){toast('❌ Naam aur phone zaroori!');return;}
+  var arr=S.patients.slice();
+  var data={name:name,phone:phone,whatsapp:((gi('pf-wa')||{}).value||'').trim(),regDate:td()};
+  FDEFS.forEach(function(f){if(FS[f.k]){var el=gi('pf-'+f.k);if(el)data[f.k]=el.value;}});
+  var savedPt;
+  if(_editPid){
+    var i=arr.findIndex(function(x){return x.id==_editPid;});
+    arr[i]=Object.assign({},arr[i],data);savedPt=arr[i];toast('✅ Updated!');
+  }else{
+    var np=Object.assign({id:nid()},data);arr.push(np);savedPt=np;toast('✅ Patient added!');
+  }
+  dbSave('patients',arr);cM('m-pt');renderPts();
+  if(withWA)setTimeout(function(){openPtCardWA(savedPt.id);},300);
+}
+
+// ════════════════════════════════════════════════════════════
+// VISIT FLOW (V4 Core Feature)
+// ════════════════════════════════════════════════════════════
+function startVisit(){
+  var q=gi('vs-q');if(q)q.value='';
+  vsSearch();oM('m-ptsel');
+}
+
+function vsSearch(){
+  var q=((gi('vs-q')||{}).value||'').toLowerCase();
+  var pts=S.patients.filter(function(p){return p.name.toLowerCase().includes(q)||p.phone&&p.phone.includes(q)||(p.id+'').includes(q);});
+  var el=gi('vs-list');if(!el)return;
+  if(!pts.length){el.innerHTML='<div style="text-align:center;padding:18px;color:var(--ink3);font-size:12px">Koi nahi mila</div>';return;}
+  el.innerHTML=pts.map(function(p){
+    return '<div class="pti" onclick="selPt(\''+p.id+'\')" style="margin-bottom:7px">'+
+      '<div class="ptav">'+p.name[0].toUpperCase()+'</div>'+
+      '<div style="flex:1;min-width:0"><div style="font-weight:700;font-size:13px">'+p.name+'</div>'+
+      '<div style="font-size:11px;color:var(--ink2)">'+p.id+' · '+p.phone+'</div></div>'+
+      '<div style="color:var(--ink3)">›</div></div>';
+  }).join('');
+}
+
+function selPt(pid){
+  cM('m-ptsel');
+  startVisitForPt(pid);
+}
+
+function startVisitForPt(pid){
+  _curPid=pid;
+  var p=S.patients.find(function(x){return x.id==pid;});if(!p)return;
+  var mv=gi('mv-name'),ms=gi('mv-sub');
+  if(mv)mv.textContent=p.name;
+  if(ms)ms.textContent=p.id+' · '+p.phone+(p.blood?' · '+p.blood:'');
+
+  var activeTx=S.treatments.filter(function(t){return t.patientId==pid&&t.status==='Active';});
+  var mb=gi('mv-body');if(!mb)return;
+
+  var aTxHTML='';
+  if(activeTx.length){
+    aTxHTML='<div class="stit">🦷 Active Treatments — Continue karo</div>';
+    aTxHTML+=activeTx.map(function(t){
+      var paid=S.payments.filter(function(py){return py.treatmentId==t.id&&py.status==='Paid';}).reduce(function(s,py){return s+py.amount;},0);
+      var pct=t.totalSittings?Math.round(t.doneSittings/t.totalSittings*100):0;
+      return '<div style="border:1px solid var(--bd);border-radius:10px;padding:12px;margin-bottom:9px;background:#fff">'+
+        '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">'+
+        '<div style="flex:1"><div style="font-weight:700;font-size:13px">'+t.treatment+'</div>'+
+        '<div style="font-size:11px;color:var(--ink2)">'+t.doneSittings+'/'+t.totalSittings+' · Bal: '+inr(t.totalFee-paid)+'</div></div>'+sb(t.status)+'</div>'+
+        '<div class="prog" style="margin-bottom:8px"><div class="pfil" style="width:'+pct+'%"></div></div>'+
+        mkBtn('btn bt2 w sm','+ Add Sitting','openSit',t.id,'')+'</div>';
+    }).join('');
+    aTxHTML+='<div class="div"></div>';
+  }
+
+  mb.innerHTML=
+    '<div class="ibox" style="display:flex;align-items:center;gap:10px;margin-bottom:14px">'+
+    '<div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--t),var(--b));color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+p.name[0]+'</div>'+
+    '<div><div style="font-weight:700;font-size:13px">'+p.name+'</div><div style="font-size:11px;color:var(--ink2)">'+p.id+' · '+p.phone+'</div></div></div>'+
+
+    '<div class="stit">🔍 Examination</div>'+
+    '<div class="fg" style="margin-bottom:14px">'+
+    mkFld('fl','text','vs-comp','Chief Complaint','Dard, sensitivity, checkup...')+
+    mkTA('fl','vs-exam','Examination Notes','Kya dekha...',2)+
+    mkFld('fl','text','vs-diag','Diagnosis','Caries, gingivitis...')+
+    mkFld('','text','vs-tooth','Tooth No.','16, 36...')+
+    mkSel('','vs-xray','X-Ray?',['no','yes'],['No','Yes'])+
+    '</div>'+
+
+    aTxHTML+
+
+    '<div class="stit">'+(activeTx.length?'Ya Naya Treatment:':'Treatment Type:')+'</div>'+
+    '<div class="vtgrid">'+
+    '<div class="vtbtn" onclick="selVType(this,\'opd\')"><div class="ico">🏥</div><h5>OPD</h5><p>Single visit, aaj complete</p></div>'+
+    '<div class="vtbtn" onclick="selVType(this,\'long\')"><div class="ico">🦷</div><h5>Long Treatment</h5><p>Multiple sittings</p></div>'+
+    '</div>'+
+    '<div id="vt-form"></div>';
+
+  oM('m-visit');
+}
+
+function mkBtn(cls,label,fn,id,extra){
+  return '<button class="'+cls+'" onclick="'+fn+'(\''+id+'\')'+extra+'" style="margin-top:0">'+label+'</button>';
+}
+function mkFld(cls,type,id,label,ph){
+  return '<div class="f '+cls+'"><label>'+label+'</label><input id="'+id+'" type="'+type+'" placeholder="'+ph+'"></div>';
+}
+function mkTA(cls,id,label,ph,rows){
+  return '<div class="f '+cls+'"><label>'+label+'</label><textarea id="'+id+'" placeholder="'+ph+'" rows="'+rows+'"></textarea></div>';
+}
+function mkSel(cls,id,label,vals,labels){
+  return '<div class="f '+cls+'"><label>'+label+'</label><select id="'+id+'">'+vals.map(function(v,i){return '<option value="'+v+'">'+labels[i]+'</option>';}).join('')+'</select></div>';
+}
+
+function selVType(el,type){
+  document.querySelectorAll('.vtbtn').forEach(function(b){b.classList.remove('on');});
+  el.classList.add('on');
+  var f=gi('vt-form');if(!f)return;
+  if(type==='opd'){
+    f.innerHTML=
+      '<div class="stit" style="margin-top:12px">🏥 OPD Details</div>'+
+      '<div class="fg">'+
+      '<div class="f fl"><label>Treatment *</label><select id="vs-otx">'+OPD_TX.map(function(t){return '<option>'+t+'</option>';}).join('')+'</select></div>'+
+      mkFld('','number','vs-ofee','Charges (₹) *','500')+
+      mkSel('','vs-omode','Mode',['Cash','UPI','Card','Cheque','Pending'],['Cash','UPI','Card','Cheque','Pending'])+
+      mkFld('','number','vs-oamt','Amount Received','Same as charges')+
+      mkTA('fl','vs-onotes','Notes','Treatment details...',2)+
+      '</div>'+
+      '<button class="btn bt2 w" style="margin-top:12px" onclick="doOPD()">✅ Complete OPD + Receipt</button>';
+  }else{
+    f.innerHTML=
+      '<div class="stit" style="margin-top:12px">🦷 Treatment Plan</div>'+
+      '<div class="fg">'+
+      '<div class="f fl"><label>Treatment *</label><select id="vs-ltx">'+LONG_TX.map(function(t){return '<option>'+t+'</option>';}).join('')+'</select></div>'+
+      mkFld('','number','vs-lsit','Total Sittings *','')+
+      mkSel('','vs-lfreq','Frequency',['Weekly','Biweekly','Monthly','As Needed'],['Weekly','Biweekly','Monthly','As Needed'])+
+      mkFld('','number','vs-lfee','Total Fee (₹) *','10000')+
+      mkFld('','number','vs-ladv','Advance (₹)','0')+
+      mkSel('fl','vs-lamode','Advance Mode',['Cash','UPI','Card','None'],['Cash','UPI','Card','None'])+
+      mkFld('fl','date','vs-lnext','First Sitting Date','')+
+      mkTA('fl','vs-lnotes','Notes','Plan details...',2)+
+      '</div>'+
+      '<button class="btn bb3 w" style="margin-top:12px" onclick="doLong()">▶️ Treatment Plan Start</button>';
+    var si=gi('vs-lsit');if(si)si.value='3';
+    var sa=gi('vs-ladv');if(sa)sa.value='0';
+  }
+}
+
+function doOPD(){
+  var tx=((gi('vs-otx')||{}).value||'').trim();
+  var fee=parseFloat((gi('vs-ofee')||{}).value)||0;
+  if(!tx||!fee){toast('❌ Treatment aur charges zaroori!');return;}
+  var mode=(gi('vs-omode')||{}).value||'Cash';
+  var amt=parseFloat((gi('vs-oamt')||{}).value)||fee;
+  var pid=_curPid;
+  var vid='V-'+Date.now();
+  var visit={id:vid,patientId:pid,date:td(),type:'OPD',treatment:tx,
+    complaint:((gi('vs-comp')||{}).value||''),exam:((gi('vs-exam')||{}).value||''),
+    diagnosis:((gi('vs-diag')||{}).value||''),toothNo:((gi('vs-tooth')||{}).value||''),
+    xray:((gi('vs-xray')||{}).value||'no'),notes:((gi('vs-onotes')||{}).value||''),status:'Completed'};
+  dbSave('visits',S.visits.concat([visit]));
+  var isPend=mode==='Pending';
+  var pay={id:'P-'+Date.now(),patientId:pid,visitId:vid,treatmentId:null,treatment:tx,
+    totalFee:fee,amount:isPend?0:amt,dueDate:td(),payDate:isPend?'':td(),
+    mode:isPend?'':mode,status:isPend?'Pending':'Paid',
+    receipt:'RCP-'+Date.now().toString().slice(-5),notes:'OPD'};
+  dbSave('payments',S.payments.concat([pay]));
+  cM('m-visit');toast('✅ OPD Complete!');
+  var p=S.patients.find(function(x){return x.id==pid;});
+  if(p)setTimeout(function(){openOPDWA(p,visit,pay);},300);
+}
+
+function doLong(){
+  var tx=((gi('vs-ltx')||{}).value||'').trim();
+  var fee=parseFloat((gi('vs-lfee')||{}).value)||0;
+  if(!tx||!fee){toast('❌ Treatment aur fee zaroori!');return;}
+  var totalSit=parseInt((gi('vs-lsit')||{}).value)||3;
+  var freq=(gi('vs-lfreq')||{}).value||'Weekly';
+  var adv=parseFloat((gi('vs-ladv')||{}).value)||0;
+  var advMode=(gi('vs-lamode')||{}).value||'Cash';
+  var nextDate=(gi('vs-lnext')||{}).value||'';
+  var pid=_curPid;
+  var vid='V-'+Date.now();
+  var visit={id:vid,patientId:pid,date:td(),type:'Treatment',treatment:tx,
+    complaint:((gi('vs-comp')||{}).value||''),exam:((gi('vs-exam')||{}).value||''),
+    diagnosis:((gi('vs-diag')||{}).value||''),status:'Active'};
+  dbSave('visits',S.visits.concat([visit]));
+  var txId='TX-'+Date.now();
+  var txPlan={id:txId,patientId:pid,visitId:vid,treatment:tx,startDate:td(),
+    totalSittings:totalSit,doneSittings:0,freq:freq,totalFee:fee,
+    notes:((gi('vs-lnotes')||{}).value||''),status:'Active'};
+  dbSave('treatments',S.treatments.concat([txPlan]));
+  if(adv>0&&advMode!=='None'){
+    var ap={id:'P-'+(Date.now()+1),patientId:pid,treatmentId:txId,treatment:tx,
+      totalFee:fee,amount:adv,dueDate:td(),payDate:td(),mode:advMode,status:'Paid',
+      receipt:'RCP-'+Date.now().toString().slice(-5),notes:'Advance'};
+    dbSave('payments',S.payments.concat([ap]));
+  }
+  var sit={id:'S-'+Date.now(),treatmentId:txId,sitNo:1,date:'',nextDate:nextDate,status:'Upcoming',notes:'',nextPlan:''};
+  dbSave('sittings',S.sittings.concat([sit]));
+  cM('m-visit');toast('✅ Treatment plan start!');
+  var p=S.patients.find(function(x){return x.id==pid;});
+  var updTx=S.treatments.find(function(t){return t.id==txId;});
+  if(p&&updTx)setTimeout(function(){openTxStrtWA(p,updTx);},300);
+  showPg('visits');
+}
+
+// Add sitting
+function openSit(txId){
+  _curTxId=txId;
+  var tx=S.treatments.find(function(t){return t.id==txId;});if(!tx)return;
+  var prevSits=S.sittings.filter(function(s){return s.treatmentId==txId;});
+  var nextNo=prevSits.length+1;
+  var paid=S.payments.filter(function(p){return p.treatmentId==txId&&p.status==='Paid';}).reduce(function(s,p){return s+p.amount;},0);
+  var perSit=tx.totalSittings?Math.round(tx.totalFee/tx.totalSittings):0;
+  var bal=tx.totalFee-paid;
+  var mt=gi('ms-title');if(mt)mt.textContent=tx.treatment+' — Sitting '+nextNo;
+  var mb=gi('ms-body');if(!mb)return;
+  mb.innerHTML=
+    '<div class="ibox">Sitting <strong>'+nextNo+'</strong>/'+tx.totalSittings+' · Balance: <strong style="color:var(--r)">'+inr(bal)+'</strong></div>'+
+    '<div class="fg">'+
+    mkTA('fl','sit-notes','Aaj Kya Kiya *','Canal prep, impression, adjustment...',3)+
+    mkFld('fl','text','sit-instr','Patient Instructions','Kya khayen, medicine...')+
+    '</div><div class="div"></div>'+
+    '<div class="stit">💰 Payment</div>'+
+    '<div class="fg">'+
+    mkFld('','number','sit-amt','Amount (₹)',perSit)+
+    mkSel('','sit-mode','Mode',['Cash','UPI','Card','Cheque','Pending'],['Cash','UPI','Card','Cheque','Pending'])+
+    '</div><div class="div"></div>'+
+    '<div class="stit">📅 Next Sitting</div>'+
+    '<div class="fg">'+
+    mkFld('','date','sit-next','Next Date','')+
+    mkFld('','text','sit-npl','Next Plan','Crown, adjustment...')+
+    '</div>';
+  var samtEl=gi('sit-amt');if(samtEl)samtEl.value=perSit;
+  var mf=gi('ms-foot');if(mf){
+    mf.innerHTML=
+      '<button class="btn bg2" onclick="cM(\'m-sit\')" style="flex:0 0 auto">Cancel</button>'+
+      '<button class="btn bt2" style="flex:1" onclick="doSit(false)">💾 Save Sitting</button>'+
+      (nextNo>=tx.totalSittings?'<button class="btn bam" onclick="doSit(true)">🎉 Complete!</button>':'');
+  }
+  cM('m-visit');oM('m-sit');
+}
+
+function doSit(markDone){
+  var notesEl=gi('sit-notes');
+  if(!notesEl||!notesEl.value.trim()){toast('❌ Notes zaroori!');return;}
+  var tx=S.treatments.find(function(t){return t.id==_curTxId;});if(!tx)return;
+  var prevSits=S.sittings.filter(function(s){return s.treatmentId==_curTxId;});
+  var sitNo=prevSits.length+1;
+  var amt=parseFloat((gi('sit-amt')||{}).value)||0;
+  var mode=(gi('sit-mode')||{}).value||'Cash';
+  var nextDate=(gi('sit-next')||{}).value||'';
+  var nextPlan=(gi('sit-npl')||{}).value||'';
+  var sit={id:'S-'+Date.now(),treatmentId:_curTxId,sitNo:sitNo,date:td(),
+    notes:notesEl.value,instructions:((gi('sit-instr')||{}).value||''),
+    nextDate:nextDate,nextPlan:nextPlan,status:'Done'};
+  dbSave('sittings',S.sittings.concat([sit]));
+  var txArr=S.treatments.map(function(t){
+    return t.id==_curTxId?Object.assign({},t,{doneSittings:(t.doneSittings||0)+1,status:markDone?'Completed':t.status}):t;
+  });
+  dbSave('treatments',txArr);
+  if(amt>0&&mode!=='Pending'){
+    var pay={id:'P-'+Date.now(),patientId:tx.patientId,treatmentId:_curTxId,sittingId:sit.id,
+      treatment:tx.treatment,totalFee:tx.totalFee,amount:amt,dueDate:td(),payDate:td(),
+      mode:mode,status:'Paid',receipt:'RCP-'+Date.now().toString().slice(-5),notes:'Sitting '+sitNo};
+    dbSave('payments',S.payments.concat([pay]));
+  }
+  cM('m-sit');toast('✅ Sitting '+sitNo+' saved!');
+  var p=S.patients.find(function(x){return x.id==tx.patientId;});
+  var updTx=txArr.find(function(t){return t.id==_curTxId;});
+  if(p&&updTx){
+    if(markDone)setTimeout(function(){openTxDoneWA(p,updTx);},300);
+    else if(nextDate)setTimeout(function(){openNxtSitWA(p,updTx,sit);},300);
+  }
+  renderVisits();
+}
+
+// ════════════════════════════════════════════════════════════
+// VISITS PAGE
+// ════════════════════════════════════════════════════════════
+function renderVisits(){
+  var ae=gi('v-active'),de=gi('v-done');if(!ae)return;
+  var active=S.treatments.filter(function(t){return t.status==='Active';});
+  var done=S.treatments.filter(function(t){return t.status==='Completed';}).sort(function(a,b){return (b.startDate||'').localeCompare(a.startDate||'');});
+
+  if(!active.length){ae.innerHTML='<div class="empty"><div class="ei">🦷</div><p>Koi active treatment nahi<br><small style="opacity:.7">+ Visit button se shuru karo</small></p></div>';}
+  else{ae.innerHTML=active.map(function(t){return buildTCard(t);}).join('');}
+
+  if(de){
+    if(!done.length){de.innerHTML='<div style="font-size:12px;color:var(--ink3);padding:6px 0">Koi completed nahi</div>';}
+    else{de.innerHTML=done.slice(0,5).map(function(t){return buildTCardMini(t);}).join('');}
+  }
+
+  // Bind buttons (avoid onclick string escaping issues)
+  bindTCardBtns();
+}
+
+function buildTCard(t){
+  var p=S.patients.find(function(x){return x.id==t.patientId;});
+  var paid=S.payments.filter(function(py){return py.treatmentId==t.id&&py.status==='Paid';}).reduce(function(s,py){return s+py.amount;},0);
+  var bal=t.totalFee-paid;
+  var pct=t.totalSittings?Math.round(t.doneSittings/t.totalSittings*100):0;
+  var sittings=S.sittings.filter(function(s){return s.treatmentId==t.id;}).sort(function(a,b){return a.sitNo-b.sitNo;});
+  var balColor=bal>0?'var(--r)':'var(--g)';
+  return '<div class="tcard">'+
+    '<div class="thead2">'+
+    '<div style="flex:1"><div style="font-size:13px;font-weight:700">'+(p?p.name:'?')+'</div>'+
+    '<div style="font-size:10px;opacity:.7;margin-top:1px">'+(p?p.id+' · '+p.phone:'')+'</div></div>'+
+    sb(t.status)+'</div>'+
+    '<div class="tbody">'+
+    '<div style="font-weight:700;font-size:13px;margin-bottom:5px">'+t.treatment+'</div>'+
+    '<div class="prog" style="margin-bottom:5px"><div class="pfil" style="width:'+pct+'%"></div></div>'+
+    '<div style="display:flex;justify-content:space-between;font-size:11px;color:var(--ink2);margin-bottom:11px">'+
+    '<span>'+t.doneSittings+'/'+t.totalSittings+' Sittings ('+pct+'%)</span>'+
+    '<span>Bal: <span class="mn" style="color:'+balColor+'">'+inr(bal)+'</span></span></div>'+
+    sittings.map(function(s){
+      var done2=s.status==='Done';
+      var bg=done2?'var(--g)':'var(--a)';
+      return '<div class="siti">'+
+        '<div class="sinum" style="background:'+bg+'">'+s.sitNo+'</div>'+
+        '<div style="flex:1;min-width:0">'+
+        '<div style="font-weight:600;font-size:12px">Sitting '+s.sitNo+' '+(done2?'✅':'⏳')+'</div>'+
+        '<div style="font-size:10px;color:var(--ink2)">'+(s.date?fmt(s.date):'Upcoming')+(s.nextDate?' → '+fmt(s.nextDate):'')+'</div>'+
+        (s.notes?'<div style="font-size:11px;color:var(--ink2);margin-top:2px">'+s.notes+'</div>':'')+
+        '</div></div>';
+    }).join('')+
+    '<div class="tc-btns" data-txid="'+t.id+'" data-pid="'+t.patientId+'" data-bal="'+bal+'" data-status="'+t.status+'" style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap"></div>'+
+    '</div></div>';
+}
+
+function buildTCardMini(t){
+  var p=S.patients.find(function(x){return x.id==t.patientId;});
+  var paid=S.payments.filter(function(py){return py.treatmentId==t.id&&py.status==='Paid';}).reduce(function(s,py){return s+py.amount;},0);
+  return '<div style="border:1px solid var(--bd);border-radius:10px;padding:11px;margin-bottom:8px;background:#fff;opacity:.75">'+
+    '<div style="display:flex;align-items:center;gap:8px">'+
+    '<div style="flex:1"><div style="font-weight:700;font-size:12px">'+(p?p.name:'?')+' — '+t.treatment+'</div>'+
+    '<div style="font-size:11px;color:var(--ink2)">'+t.doneSittings+'/'+t.totalSittings+' sittings · '+inr(paid)+' paid</div></div>'+
+    sb(t.status)+'</div></div>';
+}
+
+function bindTCardBtns(){
+  document.querySelectorAll('.tc-btns').forEach(function(el){
+    el.innerHTML='';
+    var txId=el.getAttribute('data-txid');
+    var patId=el.getAttribute('data-pid');
+    var bal=parseFloat(el.getAttribute('data-bal'))||0;
+    var status=el.getAttribute('data-status');
+
+    var b1=document.createElement('button');
+    b1.className='btn bt2 sm';b1.style.flex='1';b1.textContent='+ Add Sitting';
+    b1.onclick=function(){_curPid=patId;openSit(txId);};
+
+    var b2=document.createElement('button');
+    b2.className='btn bwa xs';b2.textContent='📱 WA';
+    b2.onclick=function(){
+      var p=S.patients.find(function(x){return x.id==patId;});
+      var tx=S.treatments.find(function(t){return t.id==txId;});
+      if(p&&tx)openTxStrtWA(p,tx);
+    };
+
+    el.appendChild(b1);el.appendChild(b2);
+
+    if(bal>0){
+      var b3=document.createElement('button');
+      b3.className='btn bg2 xs';b3.textContent='💳 Pay';
+      b3.onclick=function(){openAddPay(txId);};
+      el.appendChild(b3);
+    }
+    if(status==='Active'){
+      var b4=document.createElement('button');
+      b4.className='btn bg2 xs';b4.textContent='✅ Done';
+      b4.onclick=function(){markDone(txId);};
+      el.appendChild(b4);
+    }
+  });
+}
+
+function markDone(txId){
+  if(!confirm('Treatment complete mark karna hai?'))return;
+  var arr=S.treatments.map(function(t){return t.id==txId?Object.assign({},t,{status:'Completed'}):t;});
+  dbSave('treatments',arr);
+  toast('✅ Treatment Complete!');
+  var tx=arr.find(function(t){return t.id==txId;});
+  var p=tx?S.patients.find(function(x){return x.id==tx.patientId;}):null;
+  if(p&&tx)setTimeout(function(){openTxDoneWA(p,tx);},300);
+  renderVisits();
+}
+
+// ════════════════════════════════════════════════════════════
+// PAYMENTS
+// ════════════════════════════════════════════════════════════
+function renderPays(){
+  var opts=[['all','Sab'],['today','Aaj'],['7d','7 Din'],['30d','30 Din']];
+  var df=gi('pay-df');
+  if(df)df.innerHTML=opts.map(function(o){return '<button class="dfb'+(o[0]===_dfPay?' on':'')+'" onclick="setPayDF(\''+o[0]+'\')">'+o[1]+'</button>';}).join('');
+  var pays=filterDate(S.payments,'dueDate',_dfPay);
+  pays=pays.sort(function(a,b){return (b.dueDate||'').localeCompare(a.dueDate||'');});
+  var totRev=S.payments.filter(function(p){return p.status==='Paid';}).reduce(function(s,p){return s+p.amount;},0);
+  var mStr=td().substring(0,7);
+  var mRev=S.payments.filter(function(p){return p.status==='Paid'&&(p.payDate||'').startsWith(mStr);}).reduce(function(s,p){return s+p.amount;},0);
+  var totPend=S.payments.filter(function(p){return p.status==='Pending';}).reduce(function(s,p){return s+(p.totalFee-p.amount);},0);
+  var ps=gi('pay-sum');
+  if(ps)ps.innerHTML=
+    '<div class="card" style="padding:9px 11px;flex:1"><div style="font-size:10px;color:var(--ink3);font-weight:600">Total</div><div class="mn g" style="font-size:15px">'+inr(totRev)+'</div></div>'+
+    '<div class="card" style="padding:9px 11px;flex:1"><div style="font-size:10px;color:var(--ink3);font-weight:600">Mahine</div><div class="mn" style="font-size:15px;color:var(--t)">'+inr(mRev)+'</div></div>'+
+    '<div class="card" style="padding:9px 11px;flex:1"><div style="font-size:10px;color:var(--ink3);font-weight:600">Pending</div><div class="mn r" style="font-size:15px">'+inr(totPend)+'</div></div>';
+  var el=gi('pay-list');if(!el)return;
+  if(!pays.length){el.innerHTML='<div class="empty"><div class="ei">💳</div><p>Koi payment nahi</p></div>';return;}
+  el.innerHTML=pays.map(function(p){
+    var bal=p.totalFee-p.amount;
+    var d2=dl(p.dueDate);
+    var dc=p.status==='Pending'&&d2<0?'var(--r)':p.status==='Pending'&&d2<=3?'var(--a)':'var(--ink3)';
+    return '<div class="card" style="padding:12px 13px;margin-bottom:8px">'+
+      '<div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:6px">'+
+      '<div style="flex:1"><div style="font-weight:700;font-size:13px">'+pname(p.patientId)+'</div>'+
+      '<div style="font-size:11px;color:var(--ink2)">'+p.treatment+'</div></div>'+sb(p.status)+'</div>'+
+      '<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:8px">'+
+      '<span>Paid: <span class="mn g">'+inr(p.amount)+'</span></span>'+
+      '<span>Bal: <span class="mn '+(bal>0?'r':'g')+'">'+inr(bal)+'</span></span>'+
+      '<span style="color:'+dc+'">'+fmt(p.dueDate)+'</span></div>'+
+      '<div style="display:flex;gap:5px;flex-wrap:wrap">'+
+      (p.mode?'<span class="bge bgg">'+p.mode+'</span>':'')+
+      (p.receipt?'<span class="bge bt">'+p.receipt+'</span>':'')+
+      (p.status==='Pending'?'<button class="btn xs bt2" onclick="markPaid(\''+p.id+'\')" style="margin-left:auto">✅ Paid</button>':'')+
+      (p.status==='Pending'?mkWABtn("openPayWA('"+p.id+"')",'📱 Remind'):'')+'</div></div>';
+  }).join('');
+}
+
+function setPayDF(v){_dfPay=v;renderPays();}
+function markPaid(pid){
+  var arr=S.payments.map(function(p){return p.id==pid?Object.assign({},p,{status:'Paid',payDate:td()}):p;});
+  dbSave('payments',arr);toast('✅ Paid!');renderPays();
+}
+
+function openAddPay(txId){
+  var tx=S.treatments.find(function(t){return t.id==txId;});if(!tx)return;
+  var paid=S.payments.filter(function(p){return p.treatmentId==txId&&p.status==='Paid';}).reduce(function(s,p){return s+p.amount;},0);
+  var bal=tx.totalFee-paid;
+  _payCtx={txId:txId,tx:tx};
+  var t=gi('mpay-title');if(t)t.textContent='Payment — '+tx.treatment;
+  var b=gi('mpay-body');if(b){
+    b.innerHTML='<div class="ibox">Balance: <strong style="color:var(--r)">'+inr(bal)+'</strong> / '+inr(tx.totalFee)+'</div>'+
+    '<div class="fg">'+
+    mkFld('','number','pay-amt','Amount (₹) *',''+bal)+
+    mkSel('','pay-mode','Mode',['Cash','UPI','Card','Cheque'],['Cash','UPI','Card','Cheque'])+
+    mkFld('','date','pay-date','Date','')+
+    mkSel('','pay-st','Status',['Paid','Pending'],['Paid','Pending'])+
+    mkFld('fl','text','pay-note','Notes','')+
+    '</div>';
+    var pd=gi('pay-date');if(pd)pd.value=td();
+  }
+  oM('m-pay');
+}
+
+function savePay(withWA){
+  var amt=parseFloat((gi('pay-amt')||{}).value)||0;
+  var mode=(gi('pay-mode')||{}).value||'Cash';
+  var status=(gi('pay-st')||{}).value||'Paid';
+  if(!amt){toast('❌ Amount daalo!');return;}
+  var ctx=_payCtx||{};var tx=ctx.tx;if(!tx){toast('❌ Error');return;}
+  var pay={id:'P-'+Date.now(),patientId:tx.patientId,treatmentId:ctx.txId,treatment:tx.treatment,
+    totalFee:tx.totalFee,amount:amt,dueDate:td(),payDate:status==='Paid'?((gi('pay-date')||{}).value||td()):'',
+    mode:mode,status:status,receipt:'RCP-'+Date.now().toString().slice(-5),
+    notes:((gi('pay-note')||{}).value||'')};
+  dbSave('payments',S.payments.concat([pay]));
+  cM('m-pay');toast('✅ Payment saved!');
+  if(withWA&&status==='Pending')setTimeout(function(){openPayWA(pay.id);},300);
+  renderPays();renderVisits();
+}
+
+// ════════════════════════════════════════════════════════════
+// REMINDERS
+// ════════════════════════════════════════════════════════════
+function renderRems(){
+  var now=td();
+  // Next sittings
+  var upSits=S.sittings.filter(function(s){return s.nextDate&&s.status==='Upcoming';}).map(function(s){
+    var tx=S.treatments.find(function(t){return t.id==s.treatmentId;});
+    return Object.assign({},s,{d2:dl(s.nextDate),pid:tx&&tx.patientId,txName:tx&&tx.treatment});
+  }).filter(function(s){return s.d2!==null;}).sort(function(a,b){return a.d2-b.d2;});
+
+  var rs=gi('r-sits');
+  if(rs){
+    if(!upSits.length){rs.innerHTML='<div style="font-size:12px;color:var(--ink3);padding:6px 0">Koi upcoming nahi</div>';}
+    else{rs.innerHTML=upSits.map(function(s){
+      var dot=s.d2<0?'var(--r)':s.d2<=1?'var(--r)':s.d2<=3?'var(--a)':'var(--g)';
+      var lbl=s.d2<0?'Overdue':s.d2===0?'TODAY':s.d2===1?'Kal':s.d2+'d';
+      return remRow(pname(s.pid),s.txName+' · '+fmt(s.nextDate),dot,lbl,'');
+    }).join('');}
+  }
+
+  // Pays
+  var pRem=S.payments.filter(function(p){return p.status==='Pending';}).map(function(p){return Object.assign({},p,{d2:dl(p.dueDate)});}).filter(function(p){return p.d2!==null;}).sort(function(a,b){return a.d2-b.d2;});
+  var rp=gi('r-pays');
+  if(rp){
+    if(!pRem.length){rp.innerHTML='<div style="font-size:12px;color:var(--g);padding:6px 0">✅ Koi pending nahi!</div>';}
+    else{rp.innerHTML=pRem.map(function(p){
+      var bal=p.totalFee-p.amount;
+      var dot=p.d2<0?'var(--r)':p.d2<=3?'var(--a)':'var(--g)';
+      var lbl=p.d2<0?'Overdue':p.d2===0?'TODAY':p.d2+'d';
+      return remRow(pname(p.patientId),p.treatment+' · '+inr(bal),dot,lbl,mkWABtn("openPayWA('"+p.id+"')",'📱'));
+    }).join('');}
+  }
+
+  // Birthdays
+  var m=new Date().getMonth()+1;
+  var bdays=S.patients.filter(function(p){return p.dob&&parseInt(p.dob.split('-')[1])===m;}).sort(function(a,b){return parseInt(a.dob.split('-')[2])-parseInt(b.dob.split('-')[2]);});
+  var rb2=gi('r-bdays');
+  if(rb2){
+    if(!bdays.length){rb2.innerHTML='<div style="font-size:12px;color:var(--ink3);padding:6px 0">Is mahine koi birthday nahi</div>';}
+    else{rb2.innerHTML=bdays.map(function(p){return remRow(p.name,fmt(p.dob.replace(/^\d{4}/,new Date().getFullYear())),'var(--p)','🎂',mkWABtn("openBdayWA('"+p.id+"')",'📱 Wish'));}).join('');}
+  }
+
+  // Followup
+  var threeAgo=new Date();threeAgo.setMonth(threeAgo.getMonth()-3);var tma=threeAgo.toISOString().split('T')[0];
+  var fup=S.patients.filter(function(p){
+    var visits=S.visits.filter(function(v){return v.patientId==p.id&&v.date;});
+    var sits=S.sittings.filter(function(s){var tx=S.treatments.find(function(t){return t.id==s.treatmentId;});return tx&&tx.patientId==p.id&&s.date;}).map(function(s){return {date:s.date};});
+    var all=visits.concat(sits);all.sort(function(a,b){return b.date.localeCompare(a.date);});
+    return !all.length||all[0].date<tma;
+  });
+  var rf=gi('r-fup');
+  if(rf){
+    if(!fup.length){rf.innerHTML='<div style="font-size:12px;color:var(--ink3);padding:6px 0">✅ Sab patients recent hain</div>';}
+    else{rf.innerHTML=fup.map(function(p){return remRow(p.name,p.phone,'var(--a)','Recall',mkWABtn("openRecallWA('"+p.id+"')",'📱 Call'));}).join('');}
+  }
+}
+
+function remRow(name,detail,dot,lbl,btn){
+  return '<div style="display:flex;align-items:center;gap:9px;padding:9px 0;border-bottom:1px solid #f1f5f9">'+
+    '<div style="width:7px;height:7px;border-radius:50%;background:'+dot+';flex-shrink:0"></div>'+
+    '<div style="flex:1;min-width:0"><div style="font-weight:600;font-size:12px">'+name+'</div>'+
+    '<div style="font-size:11px;color:var(--ink2)">'+detail+'</div></div>'+
+    '<div style="font-size:10px;font-weight:700;color:'+dot+';white-space:nowrap">'+lbl+'</div>'+
+    (btn||'')+'</div>';
+}
+
+// ════════════════════════════════════════════════════════════
+// REPORTS
+// ════════════════════════════════════════════════════════════
+function renderRep(){
+  var opts=[['today','Aaj'],['7d','7 Din'],['30d','30 Din'],['month','Mahine'],['all','Sab']];
+  var df=gi('rep-df');
+  if(df)df.innerHTML=opts.map(function(o){return '<button class="dfb'+(o[0]===_dfRep?' on':'')+'" onclick="setRepDF(\''+o[0]+'\')">'+o[1]+'</button>';}).join('');
+  var pays=filterDate(S.payments,'payDate',_dfRep);
+  var txs=filterDate(S.treatments,'startDate',_dfRep);
+  var paidP=pays.filter(function(p){return p.status==='Paid';});
+  var rev=paidP.reduce(function(s,p){return s+p.amount;},0);
+  var pend=pays.filter(function(p){return p.status==='Pending';}).reduce(function(s,p){return s+(p.totalFee-p.amount);},0);
+  var rk=gi('rep-kpis');
+  if(rk)rk.innerHTML=
+    mkKPI('t','💰',inr(rev),'Revenue','')+
+    mkKPI('r','⚠️',inr(pend),'Pending','')+
+    mkKPI('b','🦷',txs.length,'Treatments','')+
+    mkKPI('g','✅',txs.filter(function(t){return t.status==='Completed';}).length,'Completed','');
+  Object.values(_charts).forEach(function(c){try{c.destroy();}catch(e){}});_charts={};
+  var months=[],revData=[];
+  for(var i=5;i>=0;i--){var dt2=new Date();dt2.setMonth(dt2.getMonth()-i);var ms=dt2.getFullYear()+'-'+String(dt2.getMonth()+1).padStart(2,'0');months.push(dt2.toLocaleString('default',{month:'short'}));revData.push(S.payments.filter(function(p){return p.status==='Paid'&&(p.payDate||'').startsWith(ms);}).reduce(function(s,p){return s+p.amount;},0));}
+  var rc=gi('rc');if(rc)_charts.rev=new Chart(rc,{type:'bar',data:{labels:months,datasets:[{data:revData,backgroundColor:'rgba(13,148,136,.7)',borderRadius:4}]},options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{callback:function(v){return'₹'+v.toLocaleString('en-IN');},font:{size:9}}}}}});
+  var tc2={};txs.forEach(function(t){tc2[t.treatment]=(tc2[t.treatment]||0)+1;});var tl=Object.keys(tc2);
+  var tc=gi('tc');if(tc&&tl.length)_charts.tx=new Chart(tc,{type:'doughnut',data:{labels:tl,datasets:[{data:tl.map(function(k){return tc2[k];}),backgroundColor:['#0d9488','#2563eb','#dc2626','#d97706','#7c3aed','#16a34a']}]},options:{plugins:{legend:{position:'bottom',labels:{font:{size:10}}}}}});
+  var mc={};paidP.forEach(function(p){mc[p.mode]=(mc[p.mode]||0)+p.amount;});var ml=Object.keys(mc);
+  var pc=gi('pc');if(pc&&ml.length)_charts.pm=new Chart(pc,{type:'pie',data:{labels:ml,datasets:[{data:ml.map(function(k){return mc[k];}),backgroundColor:['#0d9488','#2563eb','#d97706','#7c3aed','#dc2626']}]},options:{plugins:{legend:{position:'bottom',labels:{font:{size:10}}},tooltip:{callbacks:{label:function(ctx){return'₹'+ctx.raw.toLocaleString('en-IN');}}}}}});
+}
+
+function setRepDF(v){_dfRep=v;renderRep();}
+
+function filterDate(items,field,v){
+  var now=td(),m=now.substring(0,7);
+  if(v==='today')return items.filter(function(x){return x[field]===now;});
+  if(v==='7d'){var d7=new Date();d7.setDate(d7.getDate()-7);var s7=d7.toISOString().split('T')[0];return items.filter(function(x){return x[field]&&x[field]>=s7&&x[field]<=now;});}
+  if(v==='30d'){var d30=new Date();d30.setDate(d30.getDate()-30);var s30=d30.toISOString().split('T')[0];return items.filter(function(x){return x[field]&&x[field]>=s30&&x[field]<=now;});}
+  if(v==='month')return items.filter(function(x){return (x[field]||'').startsWith(m);});
+  return items;
+}
+
+// ════════════════════════════════════════════════════════════
+// SETTINGS
+// ════════════════════════════════════════════════════════════
+function openSettings(){
+  gi('st-cn').value=CS.clinicName||'';gi('st-dn').value=CS.doctorName||'';
+  gi('st-sp').value=CS.specialty||'';gi('st-ph').value=CS.phone||'';
+  gi('st-wa').value=CS.whatsapp||'';gi('st-ad').value=CS.address||'';
+  gi('st-rv').value=CS.reviewLink||'';
+  gi('st-hi').classList.toggle('on',_lang==='hi');
+  gi('st-en').classList.toggle('on',_lang==='en');
+  buildStFields();oM('m-set');
+}
+
+function buildStFields(){
+  var el=gi('st-flds');if(!el)return;
+  el.innerHTML=FDEFS.map(function(f){
+    return '<div class="trow"><label for="stf-'+f.k+'">'+f.l+'</label>'+
+      '<label class="tog"><input type="checkbox" id="stf-'+f.k+'" '+(FS[f.k]?'checked':'')+'>'+
+      '<span class="tsl"></span></label></div>';
+  }).join('');
+}
+
+function saveClInfo(){
+  CS.clinicName=gi('st-cn').value||CS.clinicName;CS.doctorName=gi('st-dn').value||CS.doctorName;
+  CS.specialty=gi('st-sp').value||'';CS.phone=gi('st-ph').value||'';CS.whatsapp=gi('st-wa').value||'';
+  CS.address=gi('st-ad').value||'';CS.reviewLink=gi('st-rv').value||'';
+  saveLocal();updateBar();toast('✅ Info saved!');
+}
+
+function saveFields(){
+  FDEFS.forEach(function(f){var el=gi('stf-'+f.k);if(el)FS[f.k]=el.checked;});
+  saveLocal();toast('✅ Fields saved!');
+}
+
+function setStLang(l){
+  _lang=l;CS.lang=l;saveLocal();
+  gi('st-hi').classList.toggle('on',l==='hi');
+  gi('st-en').classList.toggle('on',l==='en');
+  toast('✅ Language saved!');
+}
+
+function doBackup(){
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([JSON.stringify({...S,clinic:CS},null,2)],{type:'application/json'}));
+  a.download='dentcare_'+td()+'.json';a.click();toast('✅ Backup downloaded!');
+}
+
+// ════════════════════════════════════════════════════════════
+// WHATSAPP MESSAGES
+// ════════════════════════════════════════════════════════════
+function showWA(title,hi,en,phone){
+  _waMsg=_lang==='hi'?hi:en;_waPhone=phone;
+  _waData={hi:hi,en:en};
+  gi('wa-title').textContent=title;
+  gi('wa-msg').textContent=_waMsg;
+  gi('wa-to').textContent='📱 Send to: '+(phone||'No phone');
+  gi('wa-hi').classList.toggle('on',_lang==='hi');
+  gi('wa-en').classList.toggle('on',_lang==='en');
+  oM('m-wa');
+}
+
+function setWAL(l){
+  _lang=l;
+  gi('wa-hi').classList.toggle('on',l==='hi');
+  gi('wa-en').classList.toggle('on',l==='en');
+  if(_waData){_waMsg=l==='hi'?_waData.hi:_waData.en;gi('wa-msg').textContent=_waMsg;}
+}
+
+function sendWA(){
+  if(!_waPhone){toast('❌ Phone nahi!');return;}
+  var ph=_waPhone.replace(/\D/g,'');
+  var prefix=ph.length===10?'91':'';
+  window.open('https://wa.me/'+prefix+ph+'?text='+encodeURIComponent(_waMsg),'_blank');
+  cM('m-wa');toast('✅ WhatsApp khula!');
+}
+
+function openPtCardWA(pid){
+  var p=S.patients.find(function(x){return x.id==pid;});if(!p)return;
+  var tx=S.treatments.filter(function(t){return t.patientId==pid&&t.status==='Active';})[0];
+  var hi='Namaste '+p.name+'! 🦷\n\n*'+CS.clinicName+'*\n\n👤 *Patient Card*\n🆔 ID: '+p.id+'\n📱 '+p.phone+(tx?'\n🦷 Treatment: '+tx.treatment:'')+(p.blood?'\n🩸 Blood: '+p.blood:'')+(p.medical&&p.medical!='None'?'\n🏥 '+p.medical:'')+'\n\n📍 '+CS.address+'\n👨‍⚕️ '+CS.doctorName;
+  var en='Hello '+p.name+'! 🦷\n\n*'+CS.clinicName+'*\n\n👤 *Patient Card*\n🆔 ID: '+p.id+'\n📱 '+p.phone+(tx?'\n🦷 Treatment: '+tx.treatment:'')+(p.blood?'\n🩸 Blood: '+p.blood:'')+(p.medical&&p.medical!='None'?'\n🏥 '+p.medical:'')+'\n\n📍 '+CS.address+'\n👨‍⚕️ '+CS.doctorName;
+  showWA('Patient Card',hi,en,p.whatsapp||p.phone);
+}
+
+function openOPDWA(p,v,pay){
+  var hi='Namaste '+p.name+'! ✅\n\n*OPD Receipt*\n🏥 '+CS.clinicName+'\n\n📋 '+v.treatment+'\n📅 '+fmt(v.date)+'\n💰 '+inr(pay.amount)+(pay.mode?'\n💳 '+pay.mode:'')+'\n🧾 '+pay.receipt+(pay.status==='Pending'?'\n\n⚠️ Balance pending':'')+'\n\nDhanyawad! 😊\n👨‍⚕️ '+CS.doctorName;
+  var en='Hello '+p.name+'! ✅\n\n*OPD Receipt*\n🏥 '+CS.clinicName+'\n\n📋 '+v.treatment+'\n📅 '+fmt(v.date)+'\n💰 '+inr(pay.amount)+(pay.mode?'\n💳 '+pay.mode:'')+'\n🧾 '+pay.receipt+(pay.status==='Pending'?'\nBalance pending.':'')+'\n\nThank you! 😊\n👨‍⚕️ '+CS.doctorName;
+  showWA('OPD Receipt',hi,en,p.whatsapp||p.phone);
+}
+
+function openTxStrtWA(p,tx){
+  var hi='Namaste '+p.name+'! 😊\n\n*'+tx.treatment+'* shuru ho gaya!\n\n🆔 ID: '+p.id+'\n📋 Sittings: '+tx.totalSittings+'\n⏱️ Frequency: '+tx.freq+'\n💰 Total: '+inr(tx.totalFee)+'\n\n*'+CS.clinicName+'*\n👨‍⚕️ '+CS.doctorName+(CS.phone?'\n📱 '+CS.phone:'');
+  var en='Hello '+p.name+'! 😊\n\n*'+tx.treatment+'* has started!\n\n🆔 ID: '+p.id+'\n📋 Sittings: '+tx.totalSittings+'\n💰 Total: '+inr(tx.totalFee)+'\n\n*'+CS.clinicName+'*\n👨‍⚕️ '+CS.doctorName;
+  showWA('Treatment Start',hi,en,p.whatsapp||p.phone);
+}
+
+function openTxDoneWA(p,tx){
+  var hi='Namaste '+p.name+'! 🎉\n\n*'+tx.treatment+'* pura ho gaya!\n\nDhanyawad! 😊'+(CS.reviewLink?'\n\n⭐ Review:\n'+CS.reviewLink:'')+'\n\n*'+CS.clinicName+'*';
+  var en='Hello '+p.name+'! 🎉\n\n*'+tx.treatment+'* is complete!\n\nThank you! 😊'+(CS.reviewLink?'\n\n⭐ Review:\n'+CS.reviewLink:'')+'\n\n*'+CS.clinicName+'*';
+  showWA('Treatment Complete 🎉',hi,en,p.whatsapp||p.phone);
+}
+
+function openNxtSitWA(p,tx,sit){
+  var hi='Namaste '+p.name+'! 📅\n\nAgli sitting reminder:\n🦷 '+tx.treatment+'\n📅 '+fmt(sit.nextDate)+(sit.nextPlan?'\n📋 '+sit.nextPlan:'')+'\n\nSamay par aayen! 😊\n\n*'+CS.clinicName+'*'+(CS.phone?'\n📱 '+CS.phone:'');
+  var en='Hello '+p.name+'! 📅\n\nNext sitting:\n🦷 '+tx.treatment+'\n📅 '+fmt(sit.nextDate)+'\n\nDon\'t miss it! 😊\n\n*'+CS.clinicName+'*';
+  showWA('Next Sitting Reminder',hi,en,p.whatsapp||p.phone);
+}
+
+function openPayWA(payId){
+  var pay=S.payments.find(function(x){return x.id==payId;});if(!pay)return;
+  var p=S.patients.find(function(x){return x.id==pay.patientId;});if(!p)return;
+  var bal=pay.totalFee-pay.amount;
+  var hi='Namaste '+p.name+'!\n\n💰 *Payment Reminder*\n\n🦷 '+pay.treatment+'\n💵 Total: '+inr(pay.totalFee)+'\n✅ Paid: '+inr(pay.amount)+'\n⚠️ Pending: '+inr(bal)+'\n📅 Due: '+fmt(pay.dueDate)+'\n\nKripaya jald payment karein.\n\n*'+CS.clinicName+'*'+(CS.phone?'\n📱 '+CS.phone:'');
+  var en='Hello '+p.name+'!\n\n💰 *Payment Reminder*\n\n🦷 '+pay.treatment+'\n💵 Total: '+inr(pay.totalFee)+'\n✅ Paid: '+inr(pay.amount)+'\n⚠️ Pending: '+inr(bal)+'\n📅 Due: '+fmt(pay.dueDate)+'\n\nKindly pay soon.\n\n*'+CS.clinicName+'*';
+  showWA('Payment Reminder',hi,en,p.whatsapp||p.phone);
+}
+
+function openBdayWA(pid){
+  var p=S.patients.find(function(x){return x.id==pid;});if(!p)return;
+  var hi='Happy Birthday '+p.name+'! 🎂🎉\n\n*'+CS.clinicName+'* ki taraf se dhero shubhkamnayein!\n\nAap swasth aur khush rahein! 😊\n\n👨‍⚕️ '+CS.doctorName;
+  var en='Happy Birthday '+p.name+'! 🎂🎉\n\nWarm wishes from *'+CS.clinicName+'*!\n\nStay healthy and happy! 😊\n\n👨‍⚕️ '+CS.doctorName;
+  showWA('Birthday Wish 🎂',hi,en,p.whatsapp||p.phone);
+}
+
+function openRecallWA(pid){
+  var p=S.patients.find(function(x){return x.id==pid;});if(!p)return;
+  var hi='Namaste '+p.name+'! 😊\n\nAapko yaad kiya! 🦷\n\nRegular checkup zaroori hai. Kab aa rahe hain?\n\nAppointment ke liye call karein:\n📱 '+(CS.phone||CS.whatsapp||'')+'\n\n*'+CS.clinicName+'*';
+  var en='Hello '+p.name+'! 😊\n\nWe miss you! 🦷\n\nTime for your regular dental checkup!\n\nBook appointment:\n📱 '+(CS.phone||CS.whatsapp||'')+'\n\n*'+CS.clinicName+'*';
+  showWA('Follow-up Recall',hi,en,p.whatsapp||p.phone);
+}
+
+// Bulk WA
+function setBL(l){_blang=l;gi('bwa-hi').classList.toggle('on',l==='hi');gi('bwa-en').classList.toggle('on',l==='en');}
+function openBulkWA(){oM('m-bulk');}
+function setBTmpl(t){
+  var msgs={offer:{hi:'Hamari clinic mein special offer! 🦷\n\nScaling: ₹500 sirf\nWhitening: ₹2000 sirf\n\nCall karein: '+CS.phone,en:'Special offer at our clinic! 🦷\n\nScaling: ₹500 only\nWhitening: ₹2000 only\n\nCall: '+CS.phone},recall:{hi:'Aapka regular dental checkup kaafi time se nahi hua hai. 🦷\n\nAaj appointment lijiye!\n📱 '+CS.phone,en:'You are due for your regular dental checkup! 🦷\n\nBook today!\n📱 '+CS.phone},festival:{hi:'Tyohar ki shubhkamnayein! 🎉\n\n*'+CS.clinicName+'* ki taraf se dhero pyar!\n\n👨‍⚕️ '+CS.doctorName,en:'Season\'s Greetings! 🎉\n\nWarm wishes from *'+CS.clinicName+'*!\n\n👨‍⚕️ '+CS.doctorName}};
+  var m=msgs[t];if(m){var el=gi('bwa-msg');if(el)el.value=_blang==='hi'?m.hi:m.en;}
+}
+function genBulk(){
+  var msg=((gi('bwa-msg')||{}).value||'').trim();if(!msg){toast('❌ Message likhо!');return;}
+  gi('bulk-list').innerHTML=S.patients.map(function(p){
+    var ph=(p.whatsapp||p.phone||'').replace(/\D/g,'');
+    var prefix=ph.length===10?'91':'';
+    var txt=('Namaste '+p.name+'!\n\n'+msg+'\n\n*'+CS.clinicName+'*');
+    var url='https://wa.me/'+prefix+ph+'?text='+encodeURIComponent(txt);
+    return '<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid #f1f5f9">'+
+      '<div style="flex:1"><div style="font-weight:600;font-size:12px">'+p.name+'</div>'+
+      '<div style="font-size:11px;color:var(--ink3)">'+p.phone+'</div></div>'+
+      (ph?'<a href="'+url+'" target="_blank"><button class="btn bwa xs">📱 Send</button></a>':'<span style="font-size:11px;color:var(--r)">No phone</span>')+
+      '</div>';
+  }).join('');
+}
+
+// ════════════════════════════════════════════════════════════
+// SEED DEMO DATA
+// ════════════════════════════════════════════════════════════
+function seedDemo(){
+  function d(n){var dt=new Date();dt.setDate(dt.getDate()+n);return dt.toISOString().split('T')[0];}
+  var yr=new Date().getFullYear();
+  S.patients=[
+    {id:yr+'-001',name:'Rahul Sharma',phone:'9876543210',whatsapp:'9876543210',gender:'Male',age:'32',blood:'B+',dob:'1992-04-15',medical:'Diabetes',allergy:'Penicillin',regDate:d(-30)},
+    {id:yr+'-002',name:'Priya Patel',phone:'9812345678',whatsapp:'9812345678',gender:'Female',age:'28',blood:'O+',dob:'1996-08-20',medical:'None',allergy:'None',regDate:d(-20)},
+    {id:yr+'-003',name:'Amit Kumar',phone:'9988776655',whatsapp:'',gender:'Male',age:'45',blood:'A+',dob:'1979-02-10',medical:'Hypertension',allergy:'Aspirin',regDate:d(-15)},
+    {id:yr+'-004',name:'Sunita Devi',phone:'9123456789',whatsapp:'9123456789',gender:'Female',age:'38',dob:'1986-11-05',medical:'None',allergy:'None',regDate:d(-10)},
+    {id:yr+'-005',name:'Raja Mishra',phone:'9685571872',whatsapp:'9685571872',gender:'Male',age:'25',dob:'1999-05-12',medical:'None',allergy:'None',regDate:d(-5)},
+  ];
+  S.treatments=[
+    {id:'TX-001',patientId:yr+'-001',treatment:'Root Canal (RCT)',startDate:d(-20),totalSittings:3,doneSittings:2,freq:'Weekly',totalFee:9000,notes:'36 molar',status:'Active'},
+    {id:'TX-002',patientId:yr+'-003',treatment:'Orthodontic Treatment (Braces)',startDate:d(-10),totalSittings:24,doneSittings:1,freq:'Monthly',totalFee:40000,notes:'Metal braces',status:'Active'},
+  ];
+  S.sittings=[
+    {id:'S-001',treatmentId:'TX-001',sitNo:1,date:d(-20),nextDate:d(-13),status:'Done',notes:'Access opening, temporary dressing'},
+    {id:'S-002',treatmentId:'TX-001',sitNo:2,date:d(-13),nextDate:d(7),status:'Done',notes:'Canal prep done, irrigation'},
+    {id:'S-003',treatmentId:'TX-001',sitNo:3,date:'',nextDate:d(7),status:'Upcoming',nextPlan:'Obturation + Crown'},
+    {id:'S-004',treatmentId:'TX-002',sitNo:1,date:d(-10),nextDate:d(20),status:'Done',notes:'Braces fitted, wire placed'},
+    {id:'S-005',treatmentId:'TX-002',sitNo:2,date:'',nextDate:d(20),status:'Upcoming',nextPlan:'First adjustment'},
+  ];
+  S.visits=[
+    {id:'V-001',patientId:yr+'-001',date:d(-20),type:'Treatment',treatment:'Root Canal (RCT)',complaint:'Severe tooth pain 36',exam:'Deep caries, pulp exposed',diagnosis:'Irreversible pulpitis',toothNo:'36',xray:'yes',status:'Active'},
+    {id:'V-002',patientId:yr+'-002',date:d(-15),type:'OPD',treatment:'Scaling & Polishing',complaint:'Bleeding gums',diagnosis:'Chronic gingivitis',xray:'no',notes:'Full mouth scaling done',status:'Completed'},
+    {id:'V-003',patientId:yr+'-003',date:d(-10),type:'Treatment',treatment:'Orthodontic Treatment (Braces)',complaint:'Crooked teeth',diagnosis:'Malocclusion',status:'Active'},
+    {id:'V-004',patientId:yr+'-004',date:d(-3),type:'OPD',treatment:'Consultation',complaint:'Sensitivity',diagnosis:'Dentinal hypersensitivity',status:'Completed'},
+  ];
+  S.payments=[
+    {id:'P-001',patientId:yr+'-001',treatmentId:'TX-001',treatment:'Root Canal (RCT)',totalFee:9000,amount:3000,dueDate:d(-20),payDate:d(-20),mode:'Cash',status:'Paid',receipt:'RCP-001',notes:'Sitting 1'},
+    {id:'P-002',patientId:yr+'-001',treatmentId:'TX-001',treatment:'Root Canal (RCT)',totalFee:9000,amount:3000,dueDate:d(-13),payDate:d(-13),mode:'UPI',status:'Paid',receipt:'RCP-002',notes:'Sitting 2'},
+    {id:'P-003',patientId:yr+'-001',treatmentId:'TX-001',treatment:'Root Canal (RCT)',totalFee:9000,amount:3000,dueDate:d(7),payDate:'',mode:'',status:'Pending',receipt:'',notes:'Sitting 3 due'},
+    {id:'P-004',patientId:yr+'-002',treatmentId:null,treatment:'Scaling & Polishing',totalFee:1500,amount:1500,dueDate:d(-15),payDate:d(-15),mode:'Cash',status:'Paid',receipt:'RCP-003',notes:'OPD'},
+    {id:'P-005',patientId:yr+'-003',treatmentId:'TX-002',treatment:'Braces',totalFee:40000,amount:5000,dueDate:d(-10),payDate:d(-10),mode:'Card',status:'Paid',receipt:'RCP-004',notes:'Advance'},
+    {id:'P-006',patientId:yr+'-003',treatmentId:'TX-002',treatment:'Braces',totalFee:40000,amount:35000,dueDate:d(30),payDate:'',mode:'',status:'Pending',receipt:'',notes:'Balance'},
+  ];
+  ['patients','treatments','sittings','payments','visits'].forEach(function(k){localStorage.setItem('dc_'+k,JSON.stringify(S[k]));});
+}
+
+</script>
+</body>
+</html>
