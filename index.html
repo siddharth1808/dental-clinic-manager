@@ -951,25 +951,25 @@ async function loadAndEnter(){
 }
 
 function setupAdminMode(){
-  // Hide all regular nav items
+  // Hide regular nav buttons
   var regularBtns=document.querySelectorAll('#bnav .bn:not(#adm-nav-btn)');
   regularBtns.forEach(function(b){b.style.display='none';});
-  // Hide visit button in topbar
+
+  // Hide + Visit button in topbar
   var vBtn=document.querySelector('#bar .bb.pr');
   if(vBtn)vBtn.style.display='none';
-  // Show admin top button
+
+  // Show crown icon in topbar (mobile pe bhi)
   var admTop=gi('adm-top-btn');
-  if(admTop)admTop.style.display='flex';
-  // Show admin nav button
+  if(admTop){admTop.style.display='flex';admTop.style.fontSize='18px';}
+
+  // Show admin nav button (bottom nav on mobile)
   var admBtn=gi('adm-nav-btn');
-  if(admBtn)admBtn.style.display='flex';
-  // Hide sidebar regular items on desktop
-  var sidebtns=document.querySelectorAll('#bnav .bn');
-  sidebtns.forEach(function(b){
-    var oc=b.getAttribute('onclick')||'';
-    if(oc.includes('admin')){b.style.display='flex';}
-    else{b.style.display='none';}
-  });
+  if(admBtn){
+    admBtn.style.display='flex';
+    admBtn.style.flex='1';
+  }
+
   // Go to admin page directly
   showPg('admin');
 }
@@ -1214,7 +1214,11 @@ function openPtDetail(pid){
   _curPid=pid;
   var txs=S.treatments.filter(function(t){return t.patientId==pid;});
   var totalPaid=S.payments.filter(function(py){return py.patientId==pid&&py.status==='Paid';}).reduce(function(s,py){return s+py.amount;},0);
-  var totalPend=S.payments.filter(function(py){return py.patientId==pid&&py.status==='Pending';}).reduce(function(s,py){return s+(py.totalFee-py.amount);},0);
+  // Total balance = total fee across all treatments - total paid
+  var totalFeeAll=S.treatments.filter(function(t){return t.patientId==pid;}).reduce(function(s,t){return s+t.totalFee;},0);
+  var totalPaidAll=S.payments.filter(function(py){return py.patientId==pid&&py.status==='Paid';}).reduce(function(s,py){return s+py.amount;},0);
+  var totalPend=totalFeeAll-totalPaidAll;
+  if(totalPend<0)totalPend=0;
 
   var mv=gi('mv-name'),ms=gi('mv-sub');
   if(mv)mv.textContent=p.name;
@@ -1222,9 +1226,20 @@ function openPtDetail(pid){
 
   var mb=gi('mv-body');if(!mb)return;
   mb.innerHTML=
-    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:13px">'+
-    '<div class="card" style="padding:10px"><div style="font-size:10px;color:var(--ink3);font-weight:600">Total Paid</div><div class="mn g" style="font-size:16px">'+inr(totalPaid)+'</div></div>'+
-    '<div class="card" style="padding:10px"><div style="font-size:10px;color:var(--ink3);font-weight:600">Pending</div><div class="mn r" style="font-size:16px">'+inr(totalPend)+'</div></div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:13px">'+
+    '<div class="card" style="padding:10px;cursor:pointer" id="pt-pay-btn" onclick="showPtPayments(_curPid)" title="Tap to see all payments">'+
+      '<div style="font-size:10px;color:var(--ink3);font-weight:600">💰 Total Paid</div>'+
+      '<div class="mn g" style="font-size:15px">'+inr(totalPaid)+'</div>'+
+      '<div style="font-size:9px;color:var(--t);margin-top:2px">tap to view →</div>'+
+    '</div>'+
+    '<div class="card" style="padding:10px">'+
+      '<div style="font-size:10px;color:var(--ink3);font-weight:600">⚠️ Balance</div>'+
+      '<div class="mn r" style="font-size:15px">'+inr(totalPend)+'</div>'+
+    '</div>'+
+    '<div class="card" style="padding:10px">'+
+      '<div style="font-size:10px;color:var(--ink3);font-weight:600">🤝 Total Deal</div>'+
+      '<div class="mn" style="font-size:15px;color:var(--b)">'+inr(S.treatments.filter(function(t){return t.patientId==pid;}).reduce(function(s,t){return s+t.totalFee;},0))+'</div>'+
+    '</div>'+
     '</div>'+
     '<div style="font-size:12px;color:var(--ink2);margin-bottom:12px;line-height:2">'+
     (p.phone?'📱 '+p.phone+'<br>':'')+
@@ -1235,13 +1250,19 @@ function openPtDetail(pid){
     '</div>'+
     (txs.length?'<div class="stit">Treatments</div>'+txs.map(function(t){
       var paid2=S.payments.filter(function(py){return py.treatmentId==t.id&&py.status==='Paid';}).reduce(function(s,py){return s+py.amount;},0);
+      var bal2=t.totalFee-paid2;
       var pct=t.totalSittings?Math.round(t.doneSittings/t.totalSittings*100):0;
+      var isActive=t.status==='Active';
       return '<div style="border:1px solid var(--bd);border-radius:10px;padding:12px;margin-bottom:9px;background:#fff">'+
         '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">'+
         '<div style="flex:1"><div style="font-weight:700;font-size:13px">'+t.treatment+'</div>'+
-        '<div style="font-size:11px;color:var(--ink2)">'+t.doneSittings+'/'+t.totalSittings+' · '+inr(paid2)+'/'+inr(t.totalFee)+'</div></div>'+
-        sb(t.status)+'</div>'+
-        '<div class="prog"><div class="pfil" style="width:'+pct+'%"></div></div></div>';
+        '<div style="font-size:11px;color:var(--ink2)">'+t.doneSittings+'/'+t.totalSittings+' sittings · Paid: '+inr(paid2)+'</div>'+
+        '<div style="font-size:11px;font-weight:600;color:'+(bal2>0?'var(--r)':'var(--g)')+'">Balance: '+inr(bal2)+'</div>'+
+        '</div>'+sb(t.status)+'</div>'+
+        '<div class="prog" style="margin-bottom:8px"><div class="pfil" style="width:'+pct+'%"></div></div>'+
+        (isActive?'<button class="btn bt2 w sm" style="margin-top:6px" onclick="_curPid=\''+t.patientId+'\';openSit(\''+t.id+'\')">+ Add Sitting</button>':'')+
+        (isActive?'<button class="btn bam w sm" style="margin-top:4px" onclick="markDone(\''+t.id+'\')">✅ Mark Complete</button>':'')+
+        '</div>';
     }).join(''):'')+
     '<div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">'+
     '<button class="btn bt2" style="flex:1" onclick="cM(\'m-visit\');startVisitForPt(\''+pid+'\')">🏥 New Visit</button>'+
@@ -1249,7 +1270,25 @@ function openPtDetail(pid){
     '<button class="btn bg2 sm" onclick="openPtForm(false,\''+pid+'\')">✏️ Edit</button>'+
     '</div>';
   oM('m-visit');
-  setTimeout(function(){var mb2=document.querySelector('#m-visit .mbox');if(mb2)mb2.scrollTop=0;},50);
+  setTimeout(function(){
+    var mb2=document.querySelector('#m-visit .mbox');if(mb2)mb2.scrollTop=0;
+    // Bind "Add Sitting" buttons for active treatments
+    document.querySelectorAll('.pt-tx-btn').forEach(function(el){
+      var txId=el.getAttribute('data-txid');
+      var tx=S.treatments.find(function(t){return t.id==txId;});
+      if(!tx)return;
+      var b=document.createElement('button');
+      b.className='btn bt2 w sm';
+      b.textContent='+ Add Sitting / Continue';
+      b.onclick=function(){
+        _curPid=pid;
+        _curTxId=txId;
+        cM('m-visit');
+        openSit(txId);
+      };
+      el.appendChild(b);
+    });
+  },80);
 }
 
 function openPtForm(afterVisit,editId){
@@ -2041,6 +2080,38 @@ function seedDemo(){
     {id:'P-006',patientId:yr+'-003',treatmentId:'TX-002',treatment:'Braces',totalFee:40000,amount:35000,dueDate:d(30),payDate:'',mode:'',status:'Pending',receipt:'',notes:'Balance'},
   ];
   ['patients','treatments','sittings','payments','visits'].forEach(function(k){localStorage.setItem('dc_'+k,JSON.stringify(S[k]));});
+}
+
+function showPtPayments(pid){
+  var p=S.patients.find(function(x){return x.id==pid;});if(!p)return;
+  var pays=S.payments.filter(function(py){return py.patientId==pid;}).sort(function(a,b){return (b.payDate||b.dueDate||'').localeCompare(a.payDate||a.dueDate||'');});
+  var mb=gi('mv-body');if(!mb)return;
+  var gi2=gi('mv-name');if(gi2)gi2.textContent=p.name+' — Payments';
+  
+  var html='<button class="btn bg2 sm" style="margin-bottom:12px" onclick="openPtDetail(\''+pid+'\')">← Back</button>';
+  if(!pays.length){html+='<div class="empty"><div class="ei">💳</div><p>Koi payment nahi</p></div>';}
+  else{
+    html+=pays.map(function(py){
+      var txPaid=S.payments.filter(function(x){return x.treatmentId==py.treatmentId&&x.status==='Paid';}).reduce(function(s,x){return s+x.amount;},0);
+      var tx=S.treatments.find(function(t){return t.id==py.treatmentId;});
+      var txFee=tx?tx.totalFee:py.totalFee;
+      var remaining=txFee-txPaid;if(remaining<0)remaining=0;
+      return '<div class="card" style="padding:11px 13px;margin-bottom:8px">'+
+        '<div style="display:flex;justify-content:space-between;margin-bottom:5px">'+
+        '<div style="font-weight:700;font-size:13px">'+py.treatment+'</div>'+sb(py.status)+'</div>'+
+        '<div style="font-size:11px;color:var(--ink3);margin-bottom:5px">Deal: '+inr(txFee)+'</div>'+
+        '<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px">'+
+        '<span>Paid: <span class="mn g">'+inr(py.amount)+'</span></span>'+
+        '<span>Remaining: <span class="mn '+(remaining>0?'r':'g')+'">'+inr(remaining)+'</span></span>'+
+        '<span style="font-size:11px;color:var(--ink3)">'+(py.payDate?fmt(py.payDate):fmt(py.dueDate))+'</span></div>'+
+        '<div style="display:flex;gap:5px;flex-wrap:wrap">'+
+        (py.mode?'<span class="bge bgg">'+py.mode+'</span>':'')+
+        (py.receipt?'<span class="bge bt">'+py.receipt+'</span>':'')+
+        (py.notes?'<span class="bge" style="background:#f1f5f9;color:var(--ink2)">'+py.notes+'</span>':'')+
+        '</div></div>';
+    }).join('');
+  }
+  mb.innerHTML=html;
 }
 
 // ════════════════════════════════════════════════════════════════════════
