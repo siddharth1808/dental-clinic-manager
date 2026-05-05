@@ -926,6 +926,30 @@ async function loadAndEnter(){
   enterApp();
 }
 
+function setupAdminMode(){
+  // Hide all regular nav items
+  var regularBtns=document.querySelectorAll('#bnav .bn:not(#adm-nav-btn)');
+  regularBtns.forEach(function(b){b.style.display='none';});
+  // Hide visit button in topbar
+  var vBtn=document.querySelector('#bar .bb.pr');
+  if(vBtn)vBtn.style.display='none';
+  // Show admin top button
+  var admTop=gi('adm-top-btn');
+  if(admTop)admTop.style.display='flex';
+  // Show admin nav button
+  var admBtn=gi('adm-nav-btn');
+  if(admBtn)admBtn.style.display='flex';
+  // Hide sidebar regular items on desktop
+  var sidebtns=document.querySelectorAll('#bnav .bn');
+  sidebtns.forEach(function(b){
+    var oc=b.getAttribute('onclick')||'';
+    if(oc.includes('admin')){b.style.display='flex';}
+    else{b.style.display='none';}
+  });
+  // Go to admin page directly
+  showPg('admin');
+}
+
 var ADMIN_EMAILS = ['siddharth.jain1808@gmail.com']; // Add more admins here
 
 function isAdmin(){
@@ -947,13 +971,17 @@ function enterApp(){
     }
   }
   setSS('ok','Connected');
-  // Show admin button if admin
   setTimeout(function(){
-    var admin=isAdmin();
-    var admBtn=gi('adm-nav-btn');
-    if(admBtn)admBtn.style.display=admin?'flex':'none';
-    var admTop=gi('adm-top-btn');
-    if(admTop)admTop.style.display=admin?'flex':'none';
+    if(isAdmin()){
+      // Admin mode: show only admin UI
+      setupAdminMode();
+    } else {
+      // Regular mode: hide admin button
+      var admBtn=gi('adm-nav-btn');
+      if(admBtn)admBtn.style.display='none';
+      var admTop=gi('adm-top-btn');
+      if(admTop)admTop.style.display='none';
+    }
   },200);
   renderCurPg();
   if(!_demo)startAutoSync();
@@ -1037,9 +1065,11 @@ function renderCurPg(){
   var r={dash:renderDash,pts:renderPts,visits:renderVisits,pays:renderPays,rems:renderRems,rep:renderRep,admin:loadAdminData};
   if(r[_page])r[_page]();
   updateBadge();
-  // Always re-check admin visibility
-  var admBtn=gi('adm-nav-btn');
-  if(admBtn)admBtn.style.display=isAdmin()?'flex':'none';
+  // Admin visibility (only for admin)
+  if(!isAdmin()){
+    var admBtn2=gi('adm-nav-btn');
+    if(admBtn2)admBtn2.style.display='none';
+  }
 }
 
 function updateBadge(){
