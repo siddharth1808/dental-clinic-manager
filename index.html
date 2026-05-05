@@ -420,6 +420,7 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
       <div class="sp"><div class="sd of" id="sd"></div><span id="sl">Connecting</span></div>
     </div>
     <button class="bb pr" onclick="showPg('visits')" style="font-size:12px">+ Visit</button>
+    <button class="bb ic" id="adm-top-btn" style="display:none" onclick="showPg('admin')" title="Admin Dashboard">👑</button>
     <button class="bb ic" onclick="doSync()">🔄</button>
     <button class="bb ic" onclick="openSettings()">⚙️</button>
   </div>
@@ -928,7 +929,9 @@ async function loadAndEnter(){
 var ADMIN_EMAILS = ['siddharth.jain1808@gmail.com']; // Add more admins here
 
 function isAdmin(){
-  return _user && ADMIN_EMAILS.includes(_user.email.toLowerCase());
+  if(!_user||!_user.email)return false;
+  var e=(_user.email||'').toLowerCase().trim();
+  return ADMIN_EMAILS.map(function(x){return x.toLowerCase().trim();}).indexOf(e)>=0;
 }
 
 function enterApp(){
@@ -945,10 +948,13 @@ function enterApp(){
   }
   setSS('ok','Connected');
   // Show admin button if admin
-  var admBtn=gi('adm-nav-btn');
-  if(admBtn)admBtn.style.display=isAdmin()?'flex':'none';
-  var admBtnD=document.querySelector('#bnav button[onclick*=admin]');
-  if(admBtnD)admBtnD.style.display=isAdmin()?'flex':'none';
+  setTimeout(function(){
+    var admin=isAdmin();
+    var admBtn=gi('adm-nav-btn');
+    if(admBtn)admBtn.style.display=admin?'flex':'none';
+    var admTop=gi('adm-top-btn');
+    if(admTop)admTop.style.display=admin?'flex':'none';
+  },200);
   renderCurPg();
   if(!_demo)startAutoSync();
   toast('✅ Welcome! 🦷');
@@ -1031,6 +1037,9 @@ function renderCurPg(){
   var r={dash:renderDash,pts:renderPts,visits:renderVisits,pays:renderPays,rems:renderRems,rep:renderRep,admin:loadAdminData};
   if(r[_page])r[_page]();
   updateBadge();
+  // Always re-check admin visibility
+  var admBtn=gi('adm-nav-btn');
+  if(admBtn)admBtn.style.display=isAdmin()?'flex':'none';
 }
 
 function updateBadge(){
