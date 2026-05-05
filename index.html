@@ -912,16 +912,40 @@ function startPoll(){
 async function loadAndEnter(){
   if(_pollT)clearInterval(_pollT);
   var r=await api({action:'load',email:_user.email});
+  
+  // Check if this is a fresh/re-registered user (Drive data is empty)
+  var isFreshUser=false;
   if(!r.error){
+    var hasData=(r.patients&&r.patients.length>0)||(r.treatments&&r.treatments.length>0);
+    if(!hasData){
+      isFreshUser=true;
+    }
     ['patients','treatments','sittings','payments','visits'].forEach(function(k){
       if(Array.isArray(r[k]))S[k]=r[k];
     });
   }
+  
+  // Fresh user — clear ALL local data and show clinic setup
+  if(isFreshUser){
+    ['patients','treatments','sittings','payments','visits'].forEach(function(k){
+      localStorage.removeItem('dc_'+k);
+      S[k]=[];
+    });
+    localStorage.removeItem('dc_clinic_done');
+    localStorage.removeItem('seeded_'+_user.email);
+    localStorage.removeItem('dc_cs'); // Clear clinic settings too
+    showS('sc-clinic');
+    buildClFields();
+    return;
+  }
+  
+  // Existing user with data — seed demo only for brand new users
   if(S.patients.length===0&&!localStorage.getItem('seeded_'+_user.email)){
     seedDemo();
     localStorage.setItem('seeded_'+_user.email,'1');
     await apiSave(S);
   }
+  
   if(!localStorage.getItem('dc_clinic_done')){showS('sc-clinic');buildClFields();return;}
   enterApp();
 }
