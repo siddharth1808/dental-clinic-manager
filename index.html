@@ -696,7 +696,7 @@ const CLIENT_ID  = '344938253365-ddneeofor5f894p2l5bp8fgp31qor6f6.apps.googleuse
 
 let _user=null, _demo=false, _cid='', _surl='';
 let _pollT=null, _syncT=null, _saveT=null;
-let _page='dash', _lang='hi', _uiLang='hi', _blang='hi', _clang='hi';
+let _page='dash', _lang='hi', _uiLang='hi', _lastOpenedPid=null, _blang='hi', _clang='hi';
 let _editPid=null, _curPid=null, _curTxId=null, _payCtx=null;
 let _waMsg='', _waPhone='', _waData=null;
 let _dfPay='all', _dfRep='month';
@@ -1356,8 +1356,8 @@ function openPtDetail(pid){
     (p.phone?'📱 '+p.phone+'<br>':'')+
     (p.dob?'🎂 '+fmt(p.dob)+'<br>':'')+
     (p.blood?'🩸 '+p.blood+'<br>':'')+
-    (p.medical&&p.medical!='None'?'🏥 '+p.medical+'<br>':'')+
-    (p.allergy&&p.allergy!='None'?'⚠️ Allergy: '+p.allergy+'<br>':'')+
+    (p.medical&&!['none','no','n/a','nil','na','ni','नहीं','-','..'].includes(p.medical.toLowerCase())?'🏥 '+p.medical+'<br>':'')+
+    (p.allergy&&!['none','no','n/a','nil','na','ni','नहीं','-','..'].includes(p.allergy.toLowerCase())?'⚠️ Allergy: '+p.allergy+'<br>':'')+
     '</div>'+
     (txs.length?'<div class="stit">Treatments</div>'+txs.map(function(t){
       var paid2=S.payments.filter(function(py){return py.treatmentId==t.id&&py.status==='Paid';}).reduce(function(s,py){return s+py.amount;},0);
@@ -1371,8 +1371,8 @@ function openPtDetail(pid){
         '<div style="font-size:11px;font-weight:600;color:'+(bal2>0?'var(--r)':'var(--g)')+'">Balance: '+inr(bal2)+'</div>'+
         '</div>'+sb(t.status)+'</div>'+
         '<div class="prog" style="margin-bottom:8px"><div class="pfil" style="width:'+pct+'%"></div></div>'+
-        (isActive?'<button class="btn bt2 w sm" style="margin-top:6px" onclick="_curPid=\''+t.patientId+'\';openSit(\''+t.id+'\')">+ Add Sitting</button>':'')+
-        (isActive?'<button class="btn bam w sm" style="margin-top:4px" onclick="markDone(\''+t.id+'\')">✅ Mark Complete</button>':'')+
+        (isActive?'<button class="btn bt2 w sm pt-sit-btn" data-txid="'+t.id+'" data-pid="'+t.patientId+'" style="margin-top:6px">+ Add Sitting</button>':'')+
+        (isActive?'<button class="btn bam w sm pt-done-btn" data-txid="'+t.id+'" style="margin-top:4px">✅ Mark Complete</button>':'')+
         '</div>';
     }).join(''):'')+
     '<div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">'+
@@ -1590,6 +1590,7 @@ function doOPD(){
     receipt:'RCP-'+Date.now().toString().slice(-5),notes:'OPD'};
   dbSave('payments',S.payments.concat([pay]));
   cM('m-visit');toast('✅ OPD Complete!');
+  renderPts(); // Refresh patient list
   var p=S.patients.find(function(x){return x.id==pid;});
   if(p)setTimeout(function(){openOPDWA(p,visit,pay);},300);
 }
@@ -1623,6 +1624,7 @@ function doLong(){
   var sit={id:'S-'+Date.now(),treatmentId:txId,sitNo:1,date:'',nextDate:nextDate,status:'Upcoming',notes:'',nextPlan:''};
   dbSave('sittings',S.sittings.concat([sit]));
   cM('m-visit');toast('✅ Treatment plan start!');
+  renderPts(); // Refresh patient list
   var p=S.patients.find(function(x){return x.id==pid;});
   var updTx=S.treatments.find(function(t){return t.id==txId;});
   if(p&&updTx)setTimeout(function(){openTxStrtWA(p,updTx);},300);
@@ -1636,7 +1638,7 @@ function openSit(txId){
   var prevSits=S.sittings.filter(function(s){return s.treatmentId==txId;});
   var nextNo=prevSits.length+1;
   var paid=S.payments.filter(function(p){return p.treatmentId==txId&&p.status==='Paid';}).reduce(function(s,p){return s+p.amount;},0);
-  var perSit=tx.totalSittings?Math.round(tx.totalFee/tx.totalSittings):0;
+  var perSit=0; // Empty - doctor fills manually
   var bal=tx.totalFee-paid;
   var mt=gi('ms-title');if(mt)mt.textContent=tx.treatment+' — Sitting '+nextNo;
   var mb=gi('ms-body');if(!mb)return;
@@ -2094,8 +2096,8 @@ function sendWA(){
 function openPtCardWA(pid){
   var p=S.patients.find(function(x){return x.id==pid;});if(!p)return;
   var tx=S.treatments.filter(function(t){return t.patientId==pid&&t.status==='Active';})[0];
-  var hi='Namaste '+p.name+'! 🦷\n\n*'+CS.clinicName+'*\n\n👤 *Patient Card*\n🆔 ID: '+p.id+'\n📱 '+p.phone+(tx?'\n🦷 Treatment: '+tx.treatment:'')+(p.blood?'\n🩸 Blood: '+p.blood:'')+(p.medical&&p.medical!='None'?'\n🏥 '+p.medical:'')+'\n\n📍 '+CS.address+'\n👨‍⚕️ '+CS.doctorName;
-  var en='Hello '+p.name+'! 🦷\n\n*'+CS.clinicName+'*\n\n👤 *Patient Card*\n🆔 ID: '+p.id+'\n📱 '+p.phone+(tx?'\n🦷 Treatment: '+tx.treatment:'')+(p.blood?'\n🩸 Blood: '+p.blood:'')+(p.medical&&p.medical!='None'?'\n🏥 '+p.medical:'')+'\n\n📍 '+CS.address+'\n👨‍⚕️ '+CS.doctorName;
+  var hi='Namaste '+p.name+'! 🦷\n\n*'+CS.clinicName+'*\n\n👤 *Patient Card*\n🆔 ID: '+p.id+'\n📱 '+p.phone+(tx?'\n🦷 Treatment: '+tx.treatment:'')+(p.blood?'\n🩸 Blood: '+p.blood:'')+(p.medical&&!['none','no','n/a','nil','na'].includes(p.medical.toLowerCase())?'\n🏥 '+p.medical:'')+'\n\n📍 '+CS.address+'\n👨‍⚕️ '+CS.doctorName;
+  var en='Hello '+p.name+'! 🦷\n\n*'+CS.clinicName+'*\n\n👤 *Patient Card*\n🆔 ID: '+p.id+'\n📱 '+p.phone+(tx?'\n🦷 Treatment: '+tx.treatment:'')+(p.blood?'\n🩸 Blood: '+p.blood:'')+(p.medical&&!['none','no','n/a','nil','na'].includes(p.medical.toLowerCase())?'\n🏥 '+p.medical:'')+'\n\n📍 '+CS.address+'\n👨‍⚕️ '+CS.doctorName;
   showWA('Patient Card',hi,en,p.whatsapp||p.phone);
 }
 
