@@ -696,7 +696,7 @@ const CLIENT_ID  = '344938253365-ddneeofor5f894p2l5bp8fgp31qor6f6.apps.googleuse
 
 let _user=null, _demo=false, _cid='', _surl='';
 let _pollT=null, _syncT=null, _saveT=null;
-let _page='dash', _lang='hi', _uiLang='hi', _lastOpenedPid=null, _blang='hi', _clang='hi';
+let _page='dash', _lang='hi', _uiLang='hi', _lastOpenedPid=null, _sitFromPt=false, _blang='hi', _clang='hi';
 let _editPid=null, _curPid=null, _curTxId=null, _payCtx=null;
 let _waMsg='', _waPhone='', _waData=null;
 let _dfPay='all', _dfRep='month';
@@ -1665,7 +1665,8 @@ function openSit(txId){
       '<button class="btn bt2" style="flex:1" onclick="doSit(false)">💾 Save Sitting</button>'+
       (nextNo>=tx.totalSittings?'<button class="btn bam" onclick="doSit(true)">🎉 Complete!</button>':'');
   }
-  cM('m-visit');oM('m-sit');
+  if(!_sitFromPt){cM('m-visit');}  // Don't close if from patient detail
+  oM('m-sit');
 }
 
 function doSit(markDone){
@@ -1699,7 +1700,12 @@ function doSit(markDone){
     if(markDone)setTimeout(function(){openTxDoneWA(p,updTx);},300);
     else if(nextDate)setTimeout(function(){openNxtSitWA(p,updTx,sit);},300);
   }
-  renderVisits();
+  if(_sitFromPt&&_lastOpenedPid){
+    // Came from patient detail - reopen it with fresh data
+    setTimeout(function(){openPtDetail(_lastOpenedPid);},200);
+  }
+  _sitFromPt=false;
+  renderVisits();renderPts();
 }
 
 // ════════════════════════════════════════════════════════════
