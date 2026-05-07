@@ -1721,7 +1721,13 @@ function renderPays(){
   var el=gi('pay-list');if(!el)return;
   if(!pays.length){el.innerHTML='<div class="empty"><div class="ei">💳</div><p>Koi payment nahi</p></div>';return;}
   el.innerHTML=pays.map(function(p){
-    var bal=p.totalFee-p.amount;
+    // Running balance: txFee minus all payments up to and including this one
+    var tx2=S.treatments.find(function(t){return t.id==p.treatmentId;});
+    var txFee2=tx2?tx2.totalFee:p.totalFee;
+    var sortedPays=S.payments.filter(function(x){return x.treatmentId==p.treatmentId&&x.status==='Paid';}).sort(function(a,b){return (a.id+'').localeCompare(b.id+'');});
+    var runTotal=0,bal=txFee2;
+    for(var si=0;si<sortedPays.length;si++){runTotal+=sortedPays[si].amount;if(sortedPays[si].id==p.id){bal=txFee2-runTotal;break;}}
+    if(bal<0)bal=0;
     var d2=dl(p.dueDate);
     var dc=p.status==='Pending'&&d2<0?'var(--r)':p.status==='Pending'&&d2<=3?'var(--a)':'var(--ink3)';
     return '<div class="card" style="padding:12px 13px;margin-bottom:8px">'+
