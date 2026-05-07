@@ -642,7 +642,13 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
     </div>
     <button class="btn bt2 w" onclick="saveClInfo()" style="margin-bottom:13px">💾 Save Info</button>
     <div class="div"></div>
-    <div class="stit">🌐 WA Language</div>
+    <div class="stit">📱 App Language (UI)</div>
+    <div class="lrow" style="margin-bottom:4px">
+      <button class="lbtn on" id="st-ui-hi" onclick="setUILang('hi')">🇮🇳 Hinglish</button>
+      <button class="lbtn" id="st-ui-en" onclick="setUILang('en')">🇬🇧 English</button>
+    </div>
+    <div style="font-size:11px;color:var(--ink3);margin-bottom:13px">Buttons, labels, navigation ka language</div>
+    <div class="stit">💬 WhatsApp Language</div>
     <div class="lrow" style="margin-bottom:13px">
       <button class="lbtn on" id="st-hi" onclick="setStLang('hi')">🇮🇳 Hindi</button>
       <button class="lbtn" id="st-en" onclick="setStLang('en')">🇬🇧 English</button>
@@ -690,7 +696,7 @@ const CLIENT_ID  = '344938253365-ddneeofor5f894p2l5bp8fgp31qor6f6.apps.googleuse
 
 let _user=null, _demo=false, _cid='', _surl='';
 let _pollT=null, _syncT=null, _saveT=null;
-let _page='dash', _lang='hi', _blang='hi', _clang='hi';
+let _page='dash', _lang='hi', _uiLang='hi', _blang='hi', _clang='hi';
 let _editPid=null, _curPid=null, _curTxId=null, _payCtx=null;
 let _waMsg='', _waPhone='', _waData=null;
 let _dfPay='all', _dfRep='month';
@@ -720,6 +726,36 @@ window.onload=function(){
   _cid=localStorage.getItem('dc_cid')||CLIENT_ID;
   _surl=localStorage.getItem('dc_url')||SCRIPT_URL;
   if(!_cid||!_surl){showS('sc-setup');return;}
+
+  // Check saved session — skip login if already logged in
+  var savedUser=localStorage.getItem('dc_user');
+  if(savedUser){
+    try{
+      _user=JSON.parse(savedUser);
+      if(_user&&_user.email){
+        // Verify still approved then enter app
+        showS('sc-pend');
+        gi('pnd-nm').textContent='Namaste, '+_user.name+'!';
+        gi('pnd-em').textContent=_user.email;
+        gi('pnd-st').textContent='🔄 Verifying...';
+        api({action:'check',email:_user.email}).then(function(r){
+          if(r.status==='approved'){
+            if(!localStorage.getItem('dc_clinic_done')){showS('sc-clinic');buildClFields();return;}
+            enterApp();
+          } else {
+            // Session expired or rejected — show login
+            localStorage.removeItem('dc_user');
+            _user=null;
+            showS('sc-login');
+            var el=gi('cid-prev');if(el)el.textContent=_cid.substring(0,22)+'...';
+            initGIS();
+          }
+        });
+        return;
+      }
+    }catch(e){localStorage.removeItem('dc_user');}
+  }
+
   showS('sc-login');
   var el=gi('cid-prev');if(el)el.textContent=_cid.substring(0,22)+'...';
   initGIS();
@@ -727,6 +763,7 @@ window.onload=function(){
 
 function loadLocal(){
   try{var c=localStorage.getItem('dc_cs');if(c)CS=Object.assign({},CS,JSON.parse(c));}catch(e){}
+  if(CS.uiLang)_uiLang=CS.uiLang;
   try{var f=localStorage.getItem('dc_fs');if(f)FS=Object.assign({},FS,JSON.parse(f));}catch(e){}
   _lang=localStorage.getItem('dc_lang')||'hi';
   ['patients','treatments','sittings','payments','visits'].forEach(function(k){
@@ -983,6 +1020,8 @@ function isAdmin(){
 }
 
 function enterApp(){
+  // Save user session to localStorage
+  if(_user){localStorage.setItem('dc_user',JSON.stringify(_user));}
   document.querySelectorAll('.asc').forEach(function(el){el.classList.add('off');});
   gi('app').classList.add('on');
   updateBar();
@@ -995,6 +1034,7 @@ function enterApp(){
     }
   }
   setSS('ok','Connected');
+  setTimeout(applyUILang, 300);
   setTimeout(function(){
     if(isAdmin()){
       // Admin mode: show only admin UI
@@ -1028,6 +1068,7 @@ function updateBar(){
 
 function doLogout(){
   if(_pollT)clearInterval(_pollT);if(_syncT)clearInterval(_syncT);
+  localStorage.removeItem('dc_user');
   _user=null;_demo=false;
   document.querySelectorAll('.asc').forEach(function(el){el.classList.add('off');});
   gi('app').classList.remove('on');
@@ -1071,6 +1112,76 @@ function setSS(st,msg){
 // ════════════════════════════════════════════════════════════
 // NAVIGATION
 // ════════════════════════════════════════════════════════════
+// ══ UI LANGUAGE TRANSLATIONS ══════════════════════════════════════════
+var UI = {
+  en: {
+    newPatient:'+ New Patient', search:'Name, phone, ID...', bulkWA:'📱 Bulk WA',
+    newVisit:'+ New Visit / OPD', activeT:'🦷 Active Treatments', completed:'✅ Completed',
+    noActive:'No active treatments', noCompleted:'No completed treatments',
+    addSitting:'+ Add Sitting', markDone:'✅ Done', pay:'💳 Pay',
+    dashboard:'Dashboard', patients:'Patients 👥', visits:'Visits & Treatments 🦷',
+    payments:'Payments 💳', reminders:'Reminders 🔔', reports:'Reports 📊',
+    home:'Home', alerts:'Alerts', settings:'Settings ⚙️',
+    totalPaid:'💰 Total Paid', balance:'⚠️ Balance', totalDeal:'🤝 Total Deal',
+    treatments:'Treatments', newVisitBtn:'🏥 New Visit', waCard:'📱 WA Card',
+    edit:'✏️ Edit', tapView:'tap to view →',
+    todayVisits:"📅 Today's Visits", pendingDues:'⚠️ Pending Dues',
+    urgentRem:'🔔 Urgent Reminders', noVisit:'No visits today',
+    noPending:'No pending dues!', noReminder:'No urgent reminders',
+    syncedOk:'Synced ✓', saving:'Saving...', connected:'Connected',
+    refresh:'🔄 Refresh', logout:'🚪 Logout', saveInfo:'💾 Save Info',
+    saveFields:'💾 Save Fields', backup:'⬇ Backup', sync:'🔄 Sync',
+    waLang:'🌐 WA Language', appLang:'📱 App Language', clinicInfo:'🏥 Clinic Info',
+    fieldSettings:'📋 Patient Form Fields',
+    baadMein:'Skip', appKholo:'✅ Open App!',
+  },
+  hi: {
+    newPatient:'+ Naya Patient', search:'Naam, phone, ID...', bulkWA:'📱 Bulk WA',
+    newVisit:'+ Naya Visit / OPD', activeT:'🦷 Active Treatments', completed:'✅ Completed',
+    noActive:'Koi active treatment nahi', noCompleted:'Koi completed nahi',
+    addSitting:'+ Add Sitting', markDone:'✅ Done', pay:'💳 Pay',
+    dashboard:'Dashboard', patients:'Patients 👥', visits:'Visits & Treatments 🦷',
+    payments:'Payments 💳', reminders:'Reminders 🔔', reports:'Reports 📊',
+    home:'Home', alerts:'Alerts', settings:'Settings ⚙️',
+    totalPaid:'💰 Kul Paid', balance:'⚠️ Baaki', totalDeal:'🤝 Kul Deal',
+    treatments:'Treatments', newVisitBtn:'🏥 Naya Visit', waCard:'📱 WA Card',
+    edit:'✏️ Edit', tapView:'dekhne ke liye tap karein →',
+    todayVisits:'📅 Aaj ke Visits', pendingDues:'⚠️ Pending Dues',
+    urgentRem:'🔔 Zaruri Reminders', noVisit:'Aaj koi visit nahi',
+    noPending:'Koi pending nahi!', noReminder:'Koi zaruri reminder nahi',
+    syncedOk:'Sync ho gaya ✓', saving:'Save ho raha hai...', connected:'Connected',
+    refresh:'🔄 Refresh', logout:'🚪 Logout', saveInfo:'💾 Save Karo',
+    saveFields:'💾 Save Karo', backup:'⬇ Backup', sync:'🔄 Sync',
+    waLang:'🌐 WA Language', appLang:'📱 App Language', clinicInfo:'🏥 Clinic Info',
+    fieldSettings:'📋 Patient Form Fields',
+    baadMein:'Baad Mein', appKholo:'✅ App Kholo!',
+  }
+};
+function t(key){return (UI[_uiLang]||UI.hi)[key]||key;}
+function applyUILang(){
+  // Update bottom nav labels
+  var bns=document.querySelectorAll('#bnav .bn');
+  var navKeys=['home','patients','visits','payments','alerts'];
+  bns.forEach(function(bn,i){
+    var spans=bn.querySelectorAll('span:not(.bbd)');
+    if(spans.length>=2&&navKeys[i])spans[1].textContent=t(navKeys[i]);
+  });
+  // Update page title
+  var TITLES2={dash:t('dashboard'),pts:t('patients'),visits:t('visits'),pays:t('payments'),rems:t('reminders'),rep:t('reports'),admin:'👑 Admin'};
+  var bt=gi('bar-title');if(bt)bt.textContent=TITLES2[_page]||'';
+  // Update + Visit button
+  var vBtn=document.querySelector('#bar .bb.pr');
+  if(vBtn)vBtn.textContent='+ Visit';
+  // Update patient page button
+  var np=document.querySelector('#pg-pts button.bt2');
+  if(np)np.textContent=t('newPatient');
+  // Update search placeholder
+  var sq=gi('pt-q');if(sq)sq.placeholder=t('search');
+  // Update Visits page button
+  var nvBtn=document.querySelector('#pg-visits button.bt2');
+  if(nvBtn)nvBtn.textContent=t('newVisit');
+}
+
 var TITLES={dash:'Dashboard',admin:'👑 Admin Dashboard',pts:'Patients 👥',visits:'Visits & Treatments 🦷',pays:'Payments 💳',rems:'Reminders 🔔',rep:'Reports 📊'};
 
 function showPg(p){
@@ -1904,6 +2015,8 @@ function openSettings(){
   gi('st-rv').value=CS.reviewLink||'';
   gi('st-hi').classList.toggle('on',_lang==='hi');
   gi('st-en').classList.toggle('on',_lang==='en');
+  gi('st-ui-hi').classList.toggle('on',_uiLang==='hi');
+  gi('st-ui-en').classList.toggle('on',_uiLang==='en');
   buildStFields();oM('m-set');
 }
 
@@ -1932,7 +2045,15 @@ function setStLang(l){
   _lang=l;CS.lang=l;saveLocal();
   gi('st-hi').classList.toggle('on',l==='hi');
   gi('st-en').classList.toggle('on',l==='en');
-  toast('✅ Language saved!');
+  toast('✅ WA Language saved!');
+}
+function setUILang(l){
+  _uiLang=l;CS.uiLang=l;saveLocal();
+  gi('st-ui-hi').classList.toggle('on',l==='hi');
+  gi('st-ui-en').classList.toggle('on',l==='en');
+  applyUILang();
+  renderCurPg();
+  toast('✅ App Language saved!');
 }
 
 function doBackup(){
@@ -2097,11 +2218,27 @@ function showPtPayments(pid){
   var html='<button class="btn bg2 sm" style="margin-bottom:12px" onclick="openPtDetail(\''+pid+'\')">← Back</button>';
   if(!pays.length){html+='<div class="empty"><div class="ei">💳</div><p>Koi payment nahi</p></div>';}
   else{
+    // Pre-calculate running balance per treatment group
+    var txGroups={};
+    pays.forEach(function(py){
+      if(!txGroups[py.treatmentId])txGroups[py.treatmentId]=[];
+      txGroups[py.treatmentId].push(py);
+    });
+    var runBalMap={};
+    Object.keys(txGroups).forEach(function(txId){
+      var tx0=S.treatments.find(function(t){return t.id==txId;});
+      var fee0=tx0?tx0.totalFee:(txGroups[txId][0]?txGroups[txId][0].totalFee:0);
+      var cum=0;
+      txGroups[txId].forEach(function(py){
+        if(py.status==='Paid')cum+=py.amount;
+        runBalMap[py.id]=fee0-cum;
+      });
+    });
     html+=pays.map(function(py){
-      var txPaid=S.payments.filter(function(x){return x.treatmentId==py.treatmentId&&x.status==='Paid';}).reduce(function(s,x){return s+x.amount;},0);
       var tx=S.treatments.find(function(t){return t.id==py.treatmentId;});
       var txFee=tx?tx.totalFee:py.totalFee;
-      var remaining=txFee-txPaid;if(remaining<0)remaining=0;
+      var remaining=runBalMap[py.id]!==undefined?runBalMap[py.id]:txFee;
+      if(remaining<0)remaining=0;
       return '<div class="card" style="padding:11px 13px;margin-bottom:8px">'+
         '<div style="display:flex;justify-content:space-between;margin-bottom:5px">'+
         '<div style="font-weight:700;font-size:13px">'+py.treatment+'</div>'+sb(py.status)+'</div>'+
