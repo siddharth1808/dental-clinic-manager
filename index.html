@@ -1394,7 +1394,8 @@ function openPtDetail(pid){
       b.onclick=function(){
         _curPid=pid;
         _curTxId=txId;
-        cM('m-visit');
+        _sitFromPt=true;  // Keep patient detail open
+        _lastOpenedPid=pid;
         openSit(txId);
       };
       el.appendChild(b);
@@ -1621,8 +1622,14 @@ function doLong(){
       receipt:'RCP-'+Date.now().toString().slice(-5),notes:'Advance'};
     dbSave('payments',S.payments.concat([ap]));
   }
-  var sit={id:'S-'+Date.now(),treatmentId:txId,sitNo:1,date:'',nextDate:nextDate,status:'Upcoming',notes:'',nextPlan:''};
-  dbSave('sittings',S.sittings.concat([sit]));
+  // Don't auto-create sitting 1 - doctor will add sittings manually
+  // Just store the first sitting date in treatment plan
+  if(nextDate){
+    var sit={id:'S-'+Date.now(),treatmentId:txId,sitNo:1,date:'',nextDate:nextDate,status:'Upcoming',notes:'',nextPlan:'First Sitting'};
+    dbSave('sittings',S.sittings.concat([sit]));
+  } else {
+    dbSave('sittings',S.sittings); // No sitting created
+  }
   cM('m-visit');toast('✅ Treatment plan start!');
   renderPts(); // Refresh patient list
   var p=S.patients.find(function(x){return x.id==pid;});
@@ -1636,7 +1643,9 @@ function openSit(txId){
   _curTxId=txId;
   var tx=S.treatments.find(function(t){return t.id==txId;});if(!tx)return;
   var prevSits=S.sittings.filter(function(s){return s.treatmentId==txId;});
-  var nextNo=prevSits.length+1;
+  // Count only "Done" sittings for numbering - skip Upcoming placeholders
+  var doneSits=prevSits.filter(function(s){return s.status==='Done';});
+  var nextNo=doneSits.length+1;
   var paid=S.payments.filter(function(p){return p.treatmentId==txId&&p.status==='Paid';}).reduce(function(s,p){return s+p.amount;},0);
   var perSit=0; // Empty - doctor fills manually
   var bal=tx.totalFee-paid;
@@ -1679,10 +1688,17 @@ function doSit(markDone){
   var mode=(gi('sit-mode')||{}).value||'Cash';
   var nextDate=(gi('sit-next')||{}).value||'';
   var nextPlan=(gi('sit-npl')||{}).value||'';
+  // If there's an Upcoming placeholder sitting, mark it done first
+  var sitArr=S.sittings.slice();
+  var placeholder=sitArr.find(function(s){return s.treatmentId==_curTxId&&s.status==='Upcoming'&&!s.date;});
+  if(placeholder){
+    // Remove the placeholder - replace with the actual sitting being added
+    sitArr=sitArr.filter(function(s){return s.id!==placeholder.id;});
+  }
   var sit={id:'S-'+Date.now(),treatmentId:_curTxId,sitNo:sitNo,date:td(),
     notes:notesEl.value,instructions:((gi('sit-instr')||{}).value||''),
     nextDate:nextDate,nextPlan:nextPlan,status:'Done'};
-  dbSave('sittings',S.sittings.concat([sit]));
+  dbSave('sittings',sitArr.concat([sit]));
   var txArr=S.treatments.map(function(t){
     return t.id==_curTxId?Object.assign({},t,{doneSittings:(t.doneSittings||0)+1,status:markDone?'Completed':t.status}):t;
   });
